@@ -3,7 +3,7 @@ import SwiftData
 import OrbitEngine
 
 /// Every habit write goes through here so views, widgets and intents behave the same.
-/// Callers save the context (the app's main context autosaves; intents call `save()`).
+/// Each write saves right away: widgets read the store from another process, and autosave may come too late.
 public enum HabitRepository {
     /// Sets the day's value; 0 removes the log.
     public static func setValue(_ value: Int, for habit: Habit, day: Int, in context: ModelContext) {
@@ -19,6 +19,7 @@ public enum HabitRepository {
             insertLog(habit: habit, day: day, value: value, skipped: false, in: context)
         }
         habit.updatedAt = .now
+        save(context)
     }
 
     /// Check habits: done ↔ not done. Count habits: target reached ↔ 0.
@@ -50,6 +51,7 @@ public enum HabitRepository {
             if log.value > 0 { log.isSkipped = false } else { delete(log, from: habit, in: context) }
         }
         habit.updatedAt = .now
+        save(context)
         return true
     }
 
@@ -62,12 +64,22 @@ public enum HabitRepository {
         for (index, habit) in ordered.enumerated() where habit.sortOrder != index {
             habit.sortOrder = index
         }
+        habits.first?.modelContext.map(save)
     }
 
     /// Used habits are archived, never deleted (CLAUDE.md data rule).
     public static func setArchived(_ archived: Bool, _ habit: Habit) {
         habit.isArchived = archived
         habit.updatedAt = .now
+        habit.modelContext.map(save)
+    }
+
+    public static func save(_ context: ModelContext) {
+        do {
+            try context.save()
+        } catch {
+            assertionFailure("Saving habits failed: \(error)")
+        }
     }
 
     /// Also drops it from `habit.logs` right away; SwiftData would otherwise keep it there until the next save.
@@ -79,6 +91,8 @@ public enum HabitRepository {
     private static func insertLog(habit: Habit, day: Int, value: Int, skipped: Bool, in context: ModelContext) {
         let log = HabitLog(habit: habit, dayKey: day, value: value, isSkipped: skipped)
         context.insert(log)
-        log.habit = habit
+        // Append on the habit side: setting only `log.habit` updates the inverse silently,
+        // so views observing `habit.logs` wouldn't redraw.
+        habit.logs.append(log)
     }
 }

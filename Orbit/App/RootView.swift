@@ -9,7 +9,7 @@ struct RootView: View {
         TabView {
             Tab { TodayView() } label: { tabLabel("tab.today", "circle.circle") }
             Tab { ComingSoonView(title: "tab.finance", icon: "wallet.bifold") } label: { tabLabel("tab.finance", "wallet.bifold") }
-            Tab { ComingSoonView(title: "tab.habits", icon: "checkmark.circle") } label: { tabLabel("tab.habits", "checkmark.circle") }
+            Tab { HabitsView() } label: { tabLabel("tab.habits", "checkmark.circle") }
             Tab { ComingSoonView(title: "tab.workout", icon: "dumbbell") } label: { tabLabel("tab.workout", "dumbbell") }
             Tab { ComingSoonView(title: "tab.insights", icon: "chart.line.uptrend.xyaxis") } label: {
                 tabLabel("tab.insights", "chart.line.uptrend.xyaxis")
