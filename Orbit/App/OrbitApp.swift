@@ -22,6 +22,7 @@ struct OrbitApp: App {
         }
         // Built-in exercise library (WRK-01); no-op once seeded, retried next launch if it fails.
         _ = try? ExerciseLibrary.seedIfNeeded(ModelContext(container))
+        _ = try? CategoryLibrary.seedIfNeeded(ModelContext(container))
         // Reopen a session left running, and wire Live Activity buttons (they can launch the app in the background).
         coordinator.attach(container)
     }

@@ -11,7 +11,7 @@ struct RootView: View {
         @Bindable var coordinator = coordinator
         TabView {
             Tab { TodayView().sessionMiniBar() } label: { tabLabel("tab.today", "circle.circle") }
-            Tab { ComingSoonView(title: "tab.finance", icon: "wallet.bifold").sessionMiniBar() } label: { tabLabel("tab.finance", "wallet.bifold") }
+            Tab { FinanceView().sessionMiniBar() } label: { tabLabel("tab.finance", "wallet.bifold") }
             Tab { HabitsView().sessionMiniBar() } label: { tabLabel("tab.habits", "checkmark.circle") }
             Tab { WorkoutView().sessionMiniBar() } label: { tabLabel("tab.workout", "dumbbell") }
             Tab { ComingSoonView(title: "tab.insights", icon: "chart.line.uptrend.xyaxis").sessionMiniBar() } label: {

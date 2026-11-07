@@ -25,6 +25,7 @@ public extension OrbitData {
     static func makePreviewContainer() -> ModelContainer {
         let container = try! makeContainer(inMemory: true)
         PreviewData.insert(into: container.mainContext)
+        PreviewData.insertFinance(into: container.mainContext)
         return container
     }
 }
@@ -89,4 +90,28 @@ enum PreviewData {
         session(legs, daysAgo: 5, minutes: 58, weight: 90, reps: 10)
         session(push, daysAgo: 2, minutes: 60, weight: 60, reps: 12)
     }
+
+    /// Wallets, a budget and a few transactions like canvas p.4.
+    static func insertFinance(into context: ModelContext, today: Date = .now) {
+        try? CategoryLibrary.seedIfNeeded(context)
+        let cats = Dictionary(((try? context.fetch(FetchDescriptor<MoneyCategory>())) ?? []).map { ($0.name, $0) }) { a, _ in a }
+        let bca = FinanceRepository.createWallet(name: "BCA", type: .bank, initialBalance: 0, sortOrder: 0, in: context)
+        let gopay = FinanceRepository.createWallet(name: "GoPay", type: .eWallet, initialBalance: 200_000, sortOrder: 1, in: context)
+        let cash = FinanceRepository.createWallet(name: "Tunai", type: .cash, initialBalance: 850_000, sortOrder: 2, in: context)
+        let ago = { (days: Double) in today.addingTimeInterval(-86_400 * days) }
+        FinanceRepository.add(kind: .income, amount: 5_000_000, wallet: bca, category: cats["category.freelance"], date: ago(2),
+                              note: "Proyek landing page", in: context)
+        FinanceRepository.add(kind: .transfer, amount: 300_000, wallet: bca, toWallet: gopay, category: nil, date: ago(2),
+                              note: "Isi saldo GoPay", fee: 1_000, in: context)
+        FinanceRepository.add(kind: .expense, amount: 50_000, wallet: cash, category: cats["category.transport"], note: "Bensin", in: context)
+        FinanceRepository.add(kind: .expense, amount: 18_000, wallet: gopay, category: cats["category.food"], note: "Sarapan", in: context)
+        let period = Period.key(today, cycleDay: 1)
+        for (key, limit) in [("category.food", 1_500_000), ("category.transport", 400_000)] as [(String, Int64)] {
+            guard let cat = cats[key] else { continue }
+            let b = Budget(category: cat, periodKey: period, limit: limit)
+            context.insert(b)
+            b.category = cat
+        }
+    }
 }
+
