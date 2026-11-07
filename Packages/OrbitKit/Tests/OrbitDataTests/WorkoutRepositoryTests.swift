@@ -79,3 +79,45 @@ struct WorkoutRepositoryTests {
         #expect(WorkoutHistory.hasRecord(better, among: all))
     }
 }
+
+struct WorkoutProgressTests {
+    @Test func progressAndWeeklyVolume() throws {
+        let ctx = try freshContext()
+        try ExerciseLibrary.seedIfNeeded(ctx)
+        let lib = Dictionary(try ctx.fetch(FetchDescriptor<Exercise>()).map { ($0.name, $0) }) { a, _ in a }
+        let bench = lib["exercise.benchPress"]!, squat = lib["exercise.backSquat"]!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Jakarta")!
+        func day(_ d: Int) -> Date { cal.date(from: DateComponents(year: 2026, month: 11, day: d, hour: 18))! }
+        func session(_ date: Date, _ sets: [(Exercise, Double, Int, Bool)]) {
+            let s = WorkoutSession(startedAt: date)
+            s.endedAt = date.addingTimeInterval(3_600)
+            ctx.insert(s)
+            for (i, (e, w, r, warm)) in sets.enumerated() {
+                let set = WorkoutSet(exercise: e, exerciseOrder: 0, setIndex: i, reps: r, weightKg: w, isWarmup: warm, isCompleted: true)
+                ctx.insert(set)
+                s.sets.append(set)
+            }
+        }
+        session(day(2), [(bench, 40, 10, true), (bench, 60, 10, false), (bench, 60, 12, false)])   // Mon wk 45
+        session(day(5), [(squat, 100, 5, false)])                                                    // Thu wk 45
+        session(day(9), [(bench, 62.5, 8, false), (bench, 60, 12, false)])                           // Mon wk 46
+        let all = try ctx.fetch(FetchDescriptor<WorkoutSession>())
+
+        let points = WorkoutHistory.progress(exerciseID: bench.id, in: all)
+        let tops: [Double] = points.map(\.topWeightKg)
+        #expect(tops == [60, 62.5])
+        #expect(points[0].topReps == 12)                       // tie on weight → more reps; warm-up ignored
+        #expect(abs(points[0].e1RM - 84) < 0.01)
+        let expectedVolume: Double = 62.5 * 8 + 60 * 12
+        #expect(points[1].volumeKg == expectedVolume)
+
+        let volume = WorkoutHistory.weeklyVolume(all, weeks: 3, firstWeekday: 2, now: day(10), calendar: cal)
+        #expect(volume.count == 3 * MuscleGroup.allCases.count)
+        let chest = volume.filter { $0.muscle == .chest }.map(\.kg)
+        let expectedChest: [Double] = [0, 1_320, 1_220]
+        #expect(chest == expectedChest)                        // empty week stays as 0
+        let legs: [Double] = volume.filter { $0.muscle == .legs }.map(\.kg)
+        #expect(legs == [0, 500, 0])
+    }
+}

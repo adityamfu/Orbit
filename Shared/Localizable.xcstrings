@@ -1255,6 +1255,159 @@
         }
       }
     },
+    "exercise.progress.a11y": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progress chart"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grafik progres"
+          }
+        }
+      }
+    },
+    "exercise.progress.bestSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best set volume"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume set terbaik"
+          }
+        }
+      }
+    },
+    "exercise.progress.e1rm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Est. 1RM"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimasi 1RM"
+          }
+        }
+      }
+    },
+    "exercise.progress.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough data yet"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data belum cukup"
+          }
+        }
+      }
+    },
+    "exercise.progress.empty.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The chart appears after two sessions with this exercise."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grafik muncul setelah dua sesi dengan latihan ini."
+          }
+        }
+      }
+    },
+    "exercise.progress.heaviest": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heaviest"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terberat"
+          }
+        }
+      }
+    },
+    "exercise.progress.metric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metric"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metrik"
+          }
+        }
+      }
+    },
+    "exercise.progress.records": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal records"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekor pribadi"
+          }
+        }
+      }
+    },
+    "exercise.progress.topSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top set"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set teratas"
+          }
+        }
+      }
+    },
     "exercise.pullUp": {
       "extractionState": "manual",
       "localizations": {
@@ -3581,6 +3734,40 @@
         }
       }
     },
+    "session.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete session"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus sesi"
+          }
+        }
+      }
+    },
+    "session.delete.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this session?"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus sesi ini?"
+          }
+        }
+      }
+    },
     "session.deleteSet": {
       "extractionState": "manual",
       "localizations": {
@@ -4948,6 +5135,23 @@
         }
       }
     },
+    "workout.history.all": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See all"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lihat semua"
+          }
+        }
+      }
+    },
     "workout.minutes %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -5029,6 +5233,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "PR"
+          }
+        }
+      }
+    },
+    "workout.progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progress"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progres"
           }
         }
       }
@@ -5143,6 +5364,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hari ini · %@"
+          }
+        }
+      }
+    },
+    "workout.volume.a11y": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly volume chart for the last 8 weeks"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grafik volume mingguan 8 minggu terakhir"
+          }
+        }
+      }
+    },
+    "workout.volume.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WEEKLY VOLUME"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VOLUME MINGGUAN"
           }
         }
       }

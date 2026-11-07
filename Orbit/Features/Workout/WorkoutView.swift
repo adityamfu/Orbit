@@ -13,6 +13,7 @@ struct WorkoutView: View {
     @Environment(\.locale) private var locale
     @AppStorage(SettingsKey.language, store: .orbit) private var language = SettingsSnapshot.defaults.language
     @AppStorage(SettingsKey.weightIncrement, store: .orbit) private var increment = SettingsSnapshot.defaults.weightIncrement
+    @AppStorage(SettingsKey.firstWeekday, store: .orbit) private var firstWeekday = SettingsSnapshot.defaults.firstWeekday
 
     @State private var editing: RoutineTemplate?
     @Environment(SessionCoordinator.self) private var coordinator
@@ -40,11 +41,26 @@ struct WorkoutView: View {
                     }
 
                     if !sessions.isEmpty {
-                        sectionTitle("workout.history")
+                        sectionTitle("workout.progress")
+                        WeeklyVolumeCard(sessions: sessions, firstWeekday: firstWeekday)
+
+                        HStack(alignment: .firstTextBaseline) {
+                            sectionTitle("workout.history")
+                            Spacer()
+                            if sessions.count > 5 {
+                                NavigationLink("workout.history.all") { HistoryListView() }
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Color.orbit.accent)
+                            }
+                        }
                         VStack(spacing: 0) {
-                            ForEach(sessions.prefix(10)) { session in
-                                HistoryRow(session: session, isRecord: WorkoutHistory.hasRecord(session, among: sessions))
-                                if session.id != sessions.prefix(10).last?.id { Divider().padding(.leading, 64) }
+                            ForEach(sessions.prefix(5)) { session in
+                                NavigationLink { SessionDetailView(session: session) } label: {
+                                    HistoryRow(session: session, isRecord: WorkoutHistory.hasRecord(session, among: sessions))
+                                        .contentShape(.rect)
+                                }
+                                .buttonStyle(.plain)
+                                if session.id != sessions.prefix(5).last?.id { Divider().padding(.leading, 52) }
                             }
                         }
                         .padding(.horizontal, 16)
@@ -214,7 +230,7 @@ private struct RoutineCard: View {
     }
 }
 
-private struct HistoryRow: View {
+struct HistoryRow: View {
     let session: WorkoutSession
     let isRecord: Bool
     @Environment(\.locale) private var locale

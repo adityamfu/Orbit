@@ -114,4 +114,52 @@ public enum WorkoutHistory {
     public static func finished(_ sessions: [WorkoutSession]) -> [WorkoutSession] {
         sessions.filter { $0.endedAt != nil }.sorted { $0.startedAt > $1.startedAt }
     }
+
+    /// WRK-11: one point per session that has this exercise, oldest first.
+    public static func progress(exerciseID: UUID, in sessions: [WorkoutSession]) -> [ExercisePoint] {
+        finished(sessions).reversed().compactMap { session in
+            let sets = session.sets.filter { $0.exercise?.id == exerciseID }.map(\.record).filter(\.isWorking)
+            let weighted = sets.filter { ($0.weightKg ?? 0) > 0 && ($0.reps ?? 0) > 0 }
+            guard let top = weighted.max(by: { ($0.weightKg!, $0.reps!) < ($1.weightKg!, $1.reps!) }) else { return nil }
+            return ExercisePoint(date: session.startedAt, topWeightKg: top.weightKg!, topReps: top.reps!,
+                                 e1RM: Strength.records(weighted).bestE1RM, volumeKg: Strength.volume(weighted))
+        }
+    }
+
+    /// WRK-11: working-set volume per muscle group per week, for the last `weeks` weeks (oldest first).
+    /// Weeks with no volume still appear (as 0) so the chart keeps its timeline.
+    public static func weeklyVolume(_ sessions: [WorkoutSession], weeks: Int, firstWeekday: Int, now: Date = .now,
+                                    calendar: Calendar = .current) -> [MuscleVolume] {
+        var cal = calendar
+        cal.firstWeekday = firstWeekday
+        guard let thisWeek = cal.dateInterval(of: .weekOfYear, for: now)?.start else { return [] }
+        let starts = (0..<weeks).reversed().compactMap { cal.date(byAdding: .weekOfYear, value: -$0, to: thisWeek) }
+        var totals: [Date: [MuscleGroup: Double]] = [:]
+        for session in finished(sessions) {
+            guard let week = cal.dateInterval(of: .weekOfYear, for: session.startedAt)?.start, starts.contains(week) else { continue }
+            for set in session.sets where set.isCompleted && !set.isWarmup {
+                guard let muscle = set.exercise?.muscleGroup else { continue }
+                totals[week, default: [:]][muscle, default: 0] += (set.weightKg ?? 0) * Double(set.reps ?? 0)
+            }
+        }
+        return starts.flatMap { week in
+            MuscleGroup.allCases.map { MuscleVolume(weekStart: week, muscle: $0, kg: totals[week]?[$0] ?? 0) }
+        }
+    }
+}
+
+public struct ExercisePoint: Identifiable, Equatable, Sendable {
+    public var id: Date { date }
+    public let date: Date
+    public let topWeightKg: Double
+    public let topReps: Int
+    public let e1RM: Double
+    public let volumeKg: Double
+}
+
+public struct MuscleVolume: Identifiable, Equatable, Sendable {
+    public var id: String { "\(weekStart.timeIntervalSince1970)-\(muscle.rawValue)" }
+    public let weekStart: Date
+    public let muscle: MuscleGroup
+    public let kg: Double
 }
