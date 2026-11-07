@@ -66,5 +66,27 @@ enum PreviewData {
         log(swift, 1, 1...6)
         log(sleep, 1, 3...20, every: 2)
         log(cook, 1, 1...28, every: 3)
+
+        // Workouts: the PPL program and a few finished sessions with progress on bench press.
+        guard let routines = try? ProgramPreset.pushPullLegs.install(in: context, language: .id),
+              let push = routines.first, let legs = routines.last else { return }
+        func session(_ routine: RoutineTemplate, daysAgo: Int, minutes: Int, weight: Double, reps: Int) {
+            let start = calendar.date(byAdding: .day, value: -daysAgo, to: today)!
+            let s = WorkoutSession(startedAt: start, template: routine)
+            s.endedAt = start.addingTimeInterval(TimeInterval(minutes * 60))
+            context.insert(s)
+            for (order, item) in routine.orderedItems.enumerated() {
+                guard let exercise = item.exercise else { continue }
+                for index in 0..<item.targetSets {
+                    let set = WorkoutSet(exercise: exercise, exerciseOrder: order, setIndex: index, reps: reps,
+                                         weightKg: order == 0 ? weight : 20, isCompleted: true, completedAt: start)
+                    context.insert(set)
+                    s.sets.append(set)
+                }
+            }
+        }
+        session(push, daysAgo: 9, minutes: 62, weight: 57.5, reps: 12)
+        session(legs, daysAgo: 5, minutes: 58, weight: 90, reps: 10)
+        session(push, daysAgo: 2, minutes: 60, weight: 60, reps: 12)
     }
 }

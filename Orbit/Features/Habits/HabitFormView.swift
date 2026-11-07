@@ -118,7 +118,7 @@ struct HabitFormView: View {
                     }
                     switch kind {
                     case .daily: EmptyView()
-                    case .weekdays: weekdayPicker
+                    case .weekdays: WeekdayPicker(selection: $weekdays)
                     case .timesPerWeek:
                         Stepper(value: $perWeek, in: 1...7) { Text("habit.schedule.timesPerWeek \(perWeek)") }
                     case .everyNDays:
@@ -160,29 +160,6 @@ struct HabitFormView: View {
                         .fontWeight(.semibold)
                         .disabled(!canSave)
                 }
-            }
-        }
-    }
-
-    private var weekdayPicker: some View {
-        var cal = Calendar(identifier: .gregorian)
-        cal.locale = locale
-        let symbols = cal.veryShortStandaloneWeekdaySymbols
-        return HStack {
-            ForEach([2, 3, 4, 5, 6, 7, 1], id: \.self) { day in
-                let on = weekdays.contains(day)
-                Button {
-                    if on { weekdays.remove(day) } else { weekdays.insert(day) }
-                } label: {
-                    Text(symbols[day - 1])
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                        .foregroundStyle(on ? Color.orbit.onAccent : Color.primary)
-                        .background(on ? Color.orbit.accent : Color.orbit.iconTile, in: .circle)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text(cal.standaloneWeekdaySymbols[day - 1]))
-                .accessibilityAddTraits(on ? .isSelected : [])
             }
         }
     }

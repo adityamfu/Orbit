@@ -115,7 +115,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         // One line when it fits; wraps instead of clipping at large Dynamic Type sizes.
         ViewThatFits(in: .horizontal) {
-            configuration.label.fixedSize()
+            configuration.label.lineLimit(1)
             configuration.label
         }
             .multilineTextAlignment(.center)
@@ -145,4 +145,23 @@ public extension ButtonStyle where Self == PrimaryButtonStyle {
         Button(String("Tambah habit pertamamu")) {}.buttonStyle(.orbitPrimary)
     }
     .padding()
+}
+
+/// Capsule button on a grey tile, for the second choice next to a primary button ("Sesi kosong").
+public struct SecondaryButtonStyle: ButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .foregroundStyle(Color.primary)
+            .padding(.horizontal, 20)
+            .frame(minHeight: 50)
+            .background(Color.orbit.iconTile, in: .capsule)
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+
+public extension ButtonStyle where Self == SecondaryButtonStyle {
+    static var orbitSecondary: SecondaryButtonStyle { SecondaryButtonStyle() }
 }
