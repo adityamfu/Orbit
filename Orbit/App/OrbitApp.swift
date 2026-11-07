@@ -49,6 +49,13 @@ struct OrbitApp: App {
                 .environment(coordinator)
                 .environment(\.locale, language.locale)
                 .onChange(of: appearance, initial: true) { _, value in apply(value) }
+                // orbit://workout from the Workout widget: start today's routine or reopen the running session.
+                .onOpenURL { url in
+                    guard url.host == "workout" else { return }
+                    let routines = (try? container.mainContext.fetch(FetchDescriptor<RoutineTemplate>())) ?? []
+                    coordinator.start(template: WorkoutHistory.routine(for: .now, in: routines),
+                                      increment: SettingsSnapshot(from: .orbit).weightIncrement, context: container.mainContext)
+                }
                 // Notifications follow the data and the app language (NTF rules: re-plan on open and on change).
                 .onChange(of: language) { NotificationScheduler.requestReschedule() }
                 .onChange(of: scenePhase) { _, phase in if phase == .active { NotificationScheduler.requestReschedule() } }

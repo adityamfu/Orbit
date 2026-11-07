@@ -6,6 +6,7 @@ import OrbitEngine
 /// Widget kinds, so every write can reload exactly the widgets that show it (CLAUDE.md rule 6).
 public enum WidgetKinds {
     public static let habits = "HabitsWidget"
+    public static let workout = "WorkoutWidget"
 
     public static func reload(_ kind: String) {
         if OrbitData.isAppOrExtension { WidgetCenter.shared.reloadTimelines(ofKind: kind) }

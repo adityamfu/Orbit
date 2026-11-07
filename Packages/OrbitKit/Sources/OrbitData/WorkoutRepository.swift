@@ -68,6 +68,7 @@ public enum WorkoutRepository {
         } catch {
             assertionFailure("Saving workouts failed: \(error)")
         }
+        WidgetKinds.reload(WidgetKinds.workout)
     }
 
     private static func renumber(_ items: [TemplateItem]) {
@@ -162,4 +163,29 @@ public struct MuscleVolume: Identifiable, Equatable, Sendable {
     public let weekStart: Date
     public let muscle: MuscleGroup
     public let kg: Double
+}
+
+/// WID-03 / WID-04: today's routine, or the running session.
+public struct WorkoutWidgetSnapshot: Sendable {
+    public var routineName: String?
+    public var exercises: [String]
+    /// Set while a session runs.
+    public var activeName: String?
+    public var activeSince: Date?
+
+    public static func load(date: Date = .now) -> WorkoutWidgetSnapshot {
+        guard let container = try? OrbitData.makeContainer() else { return .init(exercises: []) }
+        let context = ModelContext(container)
+        let routines = (try? context.fetch(FetchDescriptor<RoutineTemplate>())) ?? []
+        let routine = WorkoutHistory.routine(for: date, in: routines)
+        let active = SessionRepository.activeSession(in: context)
+        return .init(routineName: routine?.name,
+                     exercises: routine?.orderedItems.compactMap { $0.exercise?.displayName() } ?? [],
+                     activeName: active.map { $0.template?.name ?? L10n.string("workout.emptySession") },
+                     activeSince: active?.startedAt)
+    }
+
+    public static let sample = WorkoutWidgetSnapshot(
+        routineName: "Push Day",
+        exercises: ["Bench Press", "Overhead Press", "Incline DB Press", "Lateral Raise", "Tricep Pushdown"])
 }
