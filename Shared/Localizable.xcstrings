@@ -2,6 +2,91 @@
   "sourceLanguage": "en",
   "strings": {
     "": {},
+    "activity.allDone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All sets done"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semua set selesai"
+          }
+        }
+      }
+    },
+    "activity.completeSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set done"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set selesai"
+          }
+        }
+      }
+    },
+    "activity.elapsed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latihan"
+          }
+        }
+      }
+    },
+    "activity.plus30": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+30 s"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+30 dtk"
+          }
+        }
+      }
+    },
+    "activity.set %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set %1$lld of %2$lld"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set %1$lld dari %2$lld"
+          }
+        }
+      }
+    },
     "backup.error.invalid": {
       "extractionState": "manual",
       "localizations": {
@@ -2822,6 +2907,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Centang kebiasaan"
+          }
+        }
+      }
+    },
+    "intent.session.completeSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete set"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selesaikan set"
+          }
+        }
+      }
+    },
+    "intent.session.extendRest": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add 30 seconds rest"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah istirahat 30 detik"
           }
         }
       }

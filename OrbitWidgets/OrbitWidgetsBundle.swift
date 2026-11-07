@@ -8,5 +8,6 @@ struct OrbitWidgetsBundle: WidgetBundle {
 
     var body: some Widget {
         HabitsWidget()
+        WorkoutLiveActivity()
     }
 }

@@ -105,3 +105,19 @@ struct SessionRepositoryTests {
         #expect(SessionRepository.exercises(in: s).first?.sets.count == 1)  // cardio: one entry
     }
 }
+
+struct NextOpenSetTests {
+    @Test func walksExercisesInOrder() throws {
+        let ctx = try freshContext()
+        let routine = try ProgramPreset.fullBody.install(in: ctx, language: .id)[0]
+        let s = SessionRepository.start(template: routine, history: [], increment: 2.5, in: ctx)
+        let first = SessionRepository.exercises(in: s)[0]
+        #expect(SessionRepository.nextOpenSet(in: s)?.set.id == first.sets[0].id)
+        first.sets.forEach { SessionRepository.setCompleted($0, true, in: ctx) }
+        let next = try #require(SessionRepository.nextOpenSet(in: s))
+        #expect(next.exercise.order == 1)
+        #expect(next.index == 0)
+        SessionRepository.exercises(in: s).flatMap(\.sets).forEach { SessionRepository.setCompleted($0, true, in: ctx) }
+        #expect(SessionRepository.nextOpenSet(in: s) == nil)
+    }
+}

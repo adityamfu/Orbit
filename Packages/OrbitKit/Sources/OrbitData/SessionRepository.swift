@@ -133,6 +133,17 @@ public enum SessionRepository {
 
     // MARK: Reading
 
+    /// The first unticked set, walking exercises in order (what "Set selesai" ticks).
+    public static func nextOpenSet(in session: WorkoutSession) -> (set: WorkoutSet, exercise: SessionExercise, index: Int)? {
+        for entry in exercises(in: session) {
+            if let index = entry.sets.firstIndex(where: { !$0.isCompleted }) {
+                return (entry.sets[index], entry, index)
+            }
+        }
+        return nil
+    }
+
+
     public static func exercises(in session: WorkoutSession) -> [SessionExercise] {
         let items = session.template?.orderedItems ?? []
         return Dictionary(grouping: session.sets.filter { $0.exercise != nil }, by: \.exerciseOrder)

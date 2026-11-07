@@ -8,7 +8,7 @@ struct OrbitApp: App {
     @AppStorage(SettingsKey.language, store: .orbit) private var language = SettingsSnapshot.defaults.language
     @AppStorage(SettingsKey.appearance, store: .orbit) private var appearance = SettingsSnapshot.defaults.appearance
     @Environment(\.scenePhase) private var scenePhase
-    @State private var coordinator = SessionCoordinator()
+    private let coordinator = SessionCoordinator.shared
 
     private let container: ModelContainer
 
@@ -22,6 +22,8 @@ struct OrbitApp: App {
         }
         // Built-in exercise library (WRK-01); no-op once seeded, retried next launch if it fails.
         _ = try? ExerciseLibrary.seedIfNeeded(ModelContext(container))
+        // Reopen a session left running, and wire Live Activity buttons (they can launch the app in the background).
+        coordinator.attach(container)
     }
 
     /// After an update the widget extension can open (and migrate) the shared store at the same
@@ -45,8 +47,6 @@ struct OrbitApp: App {
             RootView()
                 .modelContainer(container)
                 .environment(coordinator)
-                // Reopen a session left running when the app was closed.
-                .task { coordinator.restore(from: container.mainContext) }
                 .environment(\.locale, language.locale)
                 .onChange(of: appearance, initial: true) { _, value in apply(value) }
                 // Notifications follow the data and the app language (NTF rules: re-plan on open and on change).

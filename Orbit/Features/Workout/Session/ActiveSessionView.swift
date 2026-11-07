@@ -376,7 +376,9 @@ private struct SetRow: View {
         guard let p = previous else { return "—" }
         let n = FloatingPointFormatStyle<Double>.number.precision(.fractionLength(0...2)).locale(locale)
         switch kind {
-        case .weightReps: return "\((p.weightKg ?? 0).formatted(n)) × \(p.reps ?? 0)"
+        case .weightReps:
+            guard let w = p.weightKg, w > 0 else { return "× \(p.reps ?? 0)" }
+            return "\(w.formatted(n)) × \(p.reps ?? 0)"
         case .bodyweight: return "× \(p.reps ?? 0)"
         case .duration: return locale.localized("session.seconds \(p.durationSec ?? 0)")
         case .cardio:
@@ -455,7 +457,10 @@ private struct RestTimerPill: View {
                         .foregroundStyle(Color.orbit.textSecondary)
                     Text(timerInterval: Date.now...max(end, .now), countsDown: true)
                         .font(.custom("InterTight-ExtraBold", size: 28, relativeTo: .title).monospacedDigit())
+                        .lineLimit(1)
+                        .fixedSize()
                 }
+                .layoutPriority(1)
                 Spacer(minLength: 4)
                 pillButton("−15") { coordinator.adjustRest(by: -15, exerciseName: exerciseName) }
                 pillButton("+15") { coordinator.adjustRest(by: 15, exerciseName: exerciseName) }
