@@ -7,6 +7,7 @@ import OrbitUI
 /// Habits tab (DESIGN.md §5.4, canvas p.5).
 struct HabitsView: View {
     @Query(filter: #Predicate<Habit> { !$0.isArchived }, sort: \Habit.sortOrder) private var habits: [Habit]
+    @Query(filter: #Predicate<Habit> { $0.isArchived }) private var archived: [Habit]
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(SettingsKey.firstWeekday, store: .orbit) private var firstWeekday = SettingsSnapshot.defaults.firstWeekday
@@ -63,6 +64,15 @@ struct HabitsView: View {
                         Section("habits.section.other") { rows(other, logs) }
                     }
                 }
+                if !archived.isEmpty {
+                    Section {
+                        NavigationLink {
+                            ArchivedHabitsView()
+                        } label: {
+                            LabeledContent("habits.archived") { Text(verbatim: "\(archived.count)") }
+                        }
+                    }
+                }
             }
             .scrollContentBackground(.hidden)
             .background(Color.orbit.bg)
@@ -83,15 +93,20 @@ struct HabitsView: View {
 
     private func rows(_ group: [Habit], _ logs: [UUID: [Int: HabitDay]]) -> some View {
         ForEach(group) { habit in
-            HabitRow(habit: habit, logs: logs[habit.id] ?? [:], calc: calc, today: today)
+            NavigationLink {
+                HabitDetailView(habit: habit)
+            } label: {
+                HabitRow(habit: habit, logs: logs[habit.id] ?? [:], calc: calc, today: today)
+            }
                 .swipeActions(edge: .leading) { skipAction(habit) }
                 .swipeActions(edge: .trailing) {
                     Button("habits.action.archive", systemImage: "archivebox") {
                         HabitRepository.setArchived(true, habit)
                     }
                     .tint(.gray)
+                    // System blue: the accent turns lime in dark mode, and lime can't carry the white swipe icon.
                     Button("habits.action.edit", systemImage: "pencil") { editing = habit }
-                        .tint(Color.orbit.accent)
+                        .tint(.blue)
                     if habit.type == .count, (habit.log(on: today)?.value ?? 0) > 0 {
                         Button("habits.action.reset", systemImage: "arrow.counterclockwise") {
                             HabitRepository.setValue(0, for: habit, day: today, in: context)

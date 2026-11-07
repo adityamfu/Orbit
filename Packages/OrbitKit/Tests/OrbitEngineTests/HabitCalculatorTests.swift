@@ -142,6 +142,21 @@ struct HabitCalculatorTests {
         #expect(p.total == 2)
     }
 
+    @Test func calendarStatus() {
+        let rule = HabitRule(schedule: .weekdays([2, 4, 6]), target: 4, startDay: 20261102)
+        #expect(calc.status(rule, HabitDay(value: 4), on: 20261102, today: today) == .done)
+        #expect(calc.status(rule, HabitDay(value: 1), on: 20261104, today: today) == .partial(0.25))
+        #expect(calc.status(rule, nil, on: 20261106, today: today) == .missed)
+        #expect(calc.status(rule, nil, on: 20261105, today: today) == .none)          // not scheduled
+        #expect(calc.status(rule, HabitDay(value: 0, isSkipped: true), on: 20261104, today: today) == .skipped)
+        #expect(calc.status(rule, nil, on: 20261109, today: today) == .none)          // future
+        #expect(calc.status(rule, nil, on: 20261030, today: today) == .none)          // before start
+        let daily = HabitRule(schedule: .daily, startDay: 20261101)
+        #expect(calc.status(daily, nil, on: today, today: today) == .pending)
+        // Logged on an unscheduled day still shows as done.
+        #expect(calc.status(rule, HabitDay(value: 4), on: 20261105, today: today) == .done)
+    }
+
     @Test func weekDaysStartOnConfiguredDay() {
         #expect(calc.weekDays(containing: today) == [20261102, 20261103, 20261104, 20261105, 20261106, 20261107, 20261108])
     }

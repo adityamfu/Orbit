@@ -9,6 +9,8 @@ public enum Typography {
     public static var section: Font { .custom("InterTight-Bold", size: 22, relativeTo: .title2) }
     /// Today stat tiles. Pair with `.tracking(-1.5)`.
     public static var statHero: Font { .custom("InterTight-ExtraBold", size: 64, relativeTo: .largeTitle).monospacedDigit() }
+    /// Numbers in small stat cards (habit detail).
+    public static var stat: Font { .custom("InterTight-ExtraBold", size: 28, relativeTo: .title).monospacedDigit() }
     /// Balances, quick-add amount.
     public static var amountHero: Font { .custom("InterTight-ExtraBold", size: 44, relativeTo: .largeTitle).monospacedDigit() }
     /// Amounts in lists, KPIs, small numbers.

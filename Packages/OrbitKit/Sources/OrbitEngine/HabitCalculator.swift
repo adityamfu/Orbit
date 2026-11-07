@@ -97,6 +97,30 @@ public struct HabitCalculator: Sendable {
         return (scheduled.count { isDone($0.rule, $0.logs[day]) }, scheduled.count)
     }
 
+    /// What a calendar cell shows for one day.
+    public enum DayStatus: Sendable, Equatable {
+        /// Before the start day, after today, or not scheduled (and nothing logged).
+        case none
+        case done
+        /// Count habit started but below target: share of the target reached (0–1).
+        case partial(Double)
+        case skipped
+        /// Scheduled, in the past, not done.
+        case missed
+        /// Scheduled today, not done yet.
+        case pending
+    }
+
+    public func status(_ rule: HabitRule, _ entry: HabitDay?, on day: Int, today: Int) -> DayStatus {
+        if let entry {
+            if entry.isSkipped { return .skipped }
+            if entry.value >= rule.target { return .done }
+            if entry.value > 0 { return .partial(Double(entry.value) / Double(rule.target)) }
+        }
+        guard day <= today, isScheduled(rule, on: day) else { return .none }
+        return day == today ? .pending : .missed
+    }
+
     // MARK: Weeks
 
     /// Done days in the week containing `day` (for "2/3" on weekly habits).
