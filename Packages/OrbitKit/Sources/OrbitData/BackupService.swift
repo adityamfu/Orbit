@@ -4,20 +4,22 @@ import SwiftData
 /// The whole backup file. Each phase adds its data here and bumps `currentSchemaVersion`.
 /// Older files stay importable: missing arrays decode as empty.
 public struct Backup: Codable, Equatable, Sendable {
-    /// 1 = settings only (Phase 1). 2 = + habits and logs (Phase 2).
-    public static let currentSchemaVersion = 2
+    /// 1 = settings only (Phase 1). 2 = + habits and logs (Phase 2). 3 = + workouts (Phase 3).
+    public static let currentSchemaVersion = 3
 
     public var schemaVersion: Int
     public var exportedAt: Date
     public var settings: SettingsSnapshot
     public var habits: [HabitRecord]
+    public var workouts: WorkoutRecords
 
     public init(schemaVersion: Int = Backup.currentSchemaVersion, exportedAt: Date, settings: SettingsSnapshot,
-                habits: [HabitRecord] = []) {
+                habits: [HabitRecord] = [], workouts: WorkoutRecords = WorkoutRecords()) {
         self.schemaVersion = schemaVersion
         self.exportedAt = exportedAt
         self.settings = settings
         self.habits = habits
+        self.workouts = workouts
     }
 
     public init(from decoder: any Decoder) throws {
@@ -26,6 +28,7 @@ public struct Backup: Codable, Equatable, Sendable {
         exportedAt = try c.decode(Date.self, forKey: .exportedAt)
         settings = try c.decode(SettingsSnapshot.self, forKey: .settings)
         habits = try c.decodeIfPresent([HabitRecord].self, forKey: .habits) ?? []
+        workouts = try c.decodeIfPresent(WorkoutRecords.self, forKey: .workouts) ?? WorkoutRecords()
     }
 }
 
@@ -65,7 +68,8 @@ public enum BackupError: Error, Equatable {
 public enum BackupService {
     public static func export(from defaults: UserDefaults, context: ModelContext, now: Date = .now) throws -> Data {
         let habits = try context.fetch(FetchDescriptor<Habit>(sortBy: [SortDescriptor(\.sortOrder)]))
-        let backup = Backup(exportedAt: now, settings: SettingsSnapshot(from: defaults), habits: habits.map(record))
+        let backup = Backup(exportedAt: now, settings: SettingsSnapshot(from: defaults), habits: habits.map(record),
+                            workouts: try WorkoutRecords(context: context))
         return try encoder.encode(backup)
     }
 
@@ -83,6 +87,8 @@ public enum BackupService {
     public static func restore(_ backup: Backup, into defaults: UserDefaults, context: ModelContext) throws {
         do {
             try replaceAll(with: backup, in: context)
+            // Older backups have no workouts: put the built-in exercises back.
+            try ExerciseLibrary.seedIfNeeded(context)
         } catch {
             context.rollback()
             throw error
@@ -93,8 +99,10 @@ public enum BackupService {
     }
 
     private static func replaceAll(with backup: Backup, in context: ModelContext) throws {
+        try WorkoutRecords.deleteAll(in: context)
         try context.delete(model: HabitLog.self)
         try context.delete(model: Habit.self)
+        backup.workouts.insert(into: context)
         for r in backup.habits {
             let habit = Habit(id: r.id, name: r.name, iconName: r.iconName, startDate: r.startDate,
                               sortOrder: r.sortOrder, isArchived: r.isArchived, createdAt: r.createdAt)

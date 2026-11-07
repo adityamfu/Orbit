@@ -14,11 +14,29 @@ struct OrbitApp: App {
     init() {
         OrbitFonts.register()
         do {
-            container = try OrbitData.makeContainer()
+            container = try Self.openStore()
         } catch {
             // Nothing works without the store; crash loudly in development rather than run with no data.
             fatalError("Could not open the Orbit store: \(error)")
         }
+        // Built-in exercise library (WRK-01); no-op once seeded, retried next launch if it fails.
+        _ = try? ExerciseLibrary.seedIfNeeded(ModelContext(container))
+    }
+
+    /// After an update the widget extension can open (and migrate) the shared store at the same
+    /// moment as the app; the loser gets a "model incompatible" error. Retrying after the other
+    /// process finishes opens the already-migrated store.
+    private static func openStore(attempts: Int = 4) throws -> ModelContainer {
+        var lastError: (any Error)?
+        for attempt in 0..<attempts {
+            do {
+                return try OrbitData.makeContainer()
+            } catch {
+                lastError = error
+                Thread.sleep(forTimeInterval: 0.4 * Double(attempt + 1))
+            }
+        }
+        throw lastError!
     }
 
     var body: some Scene {

@@ -6,11 +6,18 @@ public extension OrbitData {
     /// The single store shared by app and widgets (App Group). Named "Orbit" so it never opens
     /// the Phase 0 spike store (default.store) still sitting on the device.
     static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: OrbitSchemaV1.self)
+        let schema = Schema(versionedSchema: OrbitSchemaCurrent.self)
         let config = inMemory
             ? ModelConfiguration("Orbit", schema: schema, isStoredInMemoryOnly: true)
             : ModelConfiguration("Orbit", schema: schema, groupContainer: .identifier(appGroup))
         return try ModelContainer(for: schema, migrationPlan: OrbitMigrationPlan.self, configurations: config)
+    }
+
+    /// A container at a given file and schema version; tests use it to check migrations.
+    static func makeContainer(at url: URL, version: any VersionedSchema.Type) throws -> ModelContainer {
+        let schema = Schema(versionedSchema: version)
+        return try ModelContainer(for: schema, migrationPlan: OrbitMigrationPlan.self,
+                                  configurations: ModelConfiguration(schema: schema, url: url))
     }
 
     /// In-memory container with the habits from the design canvas, for `#Preview`.

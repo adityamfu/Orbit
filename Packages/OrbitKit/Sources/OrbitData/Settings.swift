@@ -110,4 +110,12 @@ public enum L10n {
         let lang = language ?? SettingsSnapshot(from: .orbit).language
         return String(localized: LocalizedStringResource(value, locale: lang.locale))
     }
+
+    /// Same, for a key only known at runtime (e.g. a built-in exercise name stored in the database).
+    /// Falls back to the key itself when the bundle has no translation (e.g. in `swift test`).
+    public static func string(key: String, language: AppLanguage? = nil) -> String {
+        let lang = language ?? SettingsSnapshot(from: .orbit).language
+        let bundle = Bundle.main.path(forResource: lang.rawValue, ofType: "lproj").flatMap(Bundle.init(path:)) ?? .main
+        return bundle.localizedString(forKey: key, value: key, table: nil)
+    }
 }
