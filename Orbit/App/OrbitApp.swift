@@ -8,6 +8,7 @@ struct OrbitApp: App {
     @AppStorage(SettingsKey.language, store: .orbit) private var language = SettingsSnapshot.defaults.language
     @AppStorage(SettingsKey.appearance, store: .orbit) private var appearance = SettingsSnapshot.defaults.appearance
     @Environment(\.scenePhase) private var scenePhase
+    @State private var coordinator = SessionCoordinator()
 
     private let container: ModelContainer
 
@@ -43,6 +44,9 @@ struct OrbitApp: App {
         WindowGroup {
             RootView()
                 .modelContainer(container)
+                .environment(coordinator)
+                // Reopen a session left running when the app was closed.
+                .task { coordinator.restore(from: container.mainContext) }
                 .environment(\.locale, language.locale)
                 .onChange(of: appearance, initial: true) { _, value in apply(value) }
                 // Notifications follow the data and the app language (NTF rules: re-plan on open and on change).

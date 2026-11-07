@@ -20,7 +20,8 @@ public struct PlannedNotification: Equatable, Sendable {
 /// Decides which notifications should exist (pure; `NotificationScheduler` applies the result).
 /// iOS keeps at most 64 pending notifications, so only the nearest 64 over the next week are kept.
 public enum NotificationPlanner {
-    public static let limit = 64
+    /// 64 is iOS's cap; one slot stays free for the rest-timer notification.
+    public static let limit = 63
 
     public static func plan(habits: [Habit], calculator: HabitCalculator, settings: SettingsSnapshot,
                             now: Date, days: Int = 7) -> [PlannedNotification] {
@@ -94,7 +95,7 @@ public enum NotificationScheduler {
         let center = UNUserNotificationCenter.current()
         let status = await center.notificationSettings().authorizationStatus
         guard status == .authorized || status == .provisional else {
-            center.removeAllPendingNotificationRequests()
+            await removeAll(except: [], center: center)
             return
         }
         guard let container = try? OrbitData.makeContainer(),
@@ -102,7 +103,7 @@ public enum NotificationScheduler {
         let settings = SettingsSnapshot(from: .orbit)
         let plan = NotificationPlanner.plan(habits: habits, calculator: .fromSettings(), settings: settings, now: now)
 
-        center.removeAllPendingNotificationRequests()
+        await removeAll(except: [restEndID], center: center)
         for item in plan {
             let content = UNMutableNotificationContent()
             switch item.kind {
@@ -119,4 +120,32 @@ public enum NotificationScheduler {
             try? await center.add(UNNotificationRequest(identifier: item.id, content: content, trigger: trigger))
         }
     }
+
+    // MARK: Rest timer (NTF-02)
+
+    static let restEndID = "rest-end"
+
+    /// "Rest is over" when the app isn't in front. Replaces any previous one.
+    public static func scheduleRestEnd(at date: Date, exerciseName: String) async {
+        let center = UNUserNotificationCenter.current()
+        guard date > .now else { return }
+        let content = UNMutableNotificationContent()
+        let language = SettingsSnapshot(from: .orbit).language
+        content.title = L10n.string("notif.restEnd.title", language: language)
+        content.body = L10n.string("notif.restEnd.body \(exerciseName)", language: language)
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, date.timeIntervalSinceNow), repeats: false)
+        try? await center.add(UNNotificationRequest(identifier: restEndID, content: content, trigger: trigger))
+    }
+
+    public static func cancelRestEnd() {
+        guard OrbitData.isAppOrExtension else { return }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [restEndID])
+    }
+
+    private static func removeAll(except keep: Set<String>, center: UNUserNotificationCenter) async {
+        let ids = await center.pendingNotificationRequests().map(\.identifier).filter { !keep.contains($0) }
+        center.removePendingNotificationRequests(withIdentifiers: ids)
+    }
 }
+

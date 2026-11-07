@@ -15,6 +15,7 @@ struct WorkoutView: View {
     @AppStorage(SettingsKey.weightIncrement, store: .orbit) private var increment = SettingsSnapshot.defaults.weightIncrement
 
     @State private var editing: RoutineTemplate?
+    @Environment(SessionCoordinator.self) private var coordinator
 
     var body: some View {
         NavigationStack {
@@ -114,19 +115,25 @@ struct WorkoutView: View {
                     .font(.subheadline)
                     .foregroundStyle(Color.orbit.textSecondary)
             }
-            // Starting a session arrives in step 3c.
             HStack(spacing: 10) {
-                if let routine {
-                    Button { } label: {
-                        Text("workout.start \(routine.name)").frame(maxWidth: .infinity)
+                if coordinator.session != nil {
+                    Button { coordinator.isPresented = true } label: {
+                        Text("session.resume").frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.orbitPrimary)
-                }
-                Button("workout.emptySession") { }
+                } else {
+                    if let routine {
+                        Button { coordinator.start(template: routine, increment: increment, context: context) } label: {
+                            Text("workout.start \(routine.name)").frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.orbitPrimary)
+                    }
+                    Button { coordinator.start(template: nil, increment: increment, context: context) } label: {
+                        Text("workout.emptySession").frame(maxWidth: routine == nil ? .infinity : nil)
+                    }
                     .buttonStyle(.orbitSecondary)
-                    .frame(maxWidth: routine == nil ? .infinity : nil)
+                }
             }
-            .disabled(true)
             .padding(.top, 8)
         }
         .padding(16)
@@ -254,10 +261,12 @@ private struct HistoryRow: View {
 
 #Preview("Workout") {
     WorkoutView()
+        .environment(SessionCoordinator())
         .modelContainer(OrbitData.makePreviewContainer())
 }
 
 #Preview("Empty") {
     WorkoutView()
+        .environment(SessionCoordinator())
         .modelContainer(try! OrbitData.makeContainer(inMemory: true))
 }

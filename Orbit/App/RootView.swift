@@ -5,17 +5,24 @@ import OrbitUI
 
 /// Icon-only tab bar (DESIGN.md §4). Labels stay for VoiceOver.
 struct RootView: View {
+    @Environment(SessionCoordinator.self) private var coordinator
+
     var body: some View {
+        @Bindable var coordinator = coordinator
         TabView {
-            Tab { TodayView() } label: { tabLabel("tab.today", "circle.circle") }
-            Tab { ComingSoonView(title: "tab.finance", icon: "wallet.bifold") } label: { tabLabel("tab.finance", "wallet.bifold") }
-            Tab { HabitsView() } label: { tabLabel("tab.habits", "checkmark.circle") }
-            Tab { WorkoutView() } label: { tabLabel("tab.workout", "dumbbell") }
-            Tab { ComingSoonView(title: "tab.insights", icon: "chart.line.uptrend.xyaxis") } label: {
+            Tab { TodayView().sessionMiniBar() } label: { tabLabel("tab.today", "circle.circle") }
+            Tab { ComingSoonView(title: "tab.finance", icon: "wallet.bifold").sessionMiniBar() } label: { tabLabel("tab.finance", "wallet.bifold") }
+            Tab { HabitsView().sessionMiniBar() } label: { tabLabel("tab.habits", "checkmark.circle") }
+            Tab { WorkoutView().sessionMiniBar() } label: { tabLabel("tab.workout", "dumbbell") }
+            Tab { ComingSoonView(title: "tab.insights", icon: "chart.line.uptrend.xyaxis").sessionMiniBar() } label: {
                 tabLabel("tab.insights", "chart.line.uptrend.xyaxis")
             }
         }
         .tint(Color.orbit.accent)
+        // WRK-14: the running session is full screen and always dark.
+        .fullScreenCover(isPresented: $coordinator.isPresented) {
+            ActiveSessionView()
+        }
     }
 
     private func tabLabel(_ title: LocalizedStringKey, _ icon: String) -> some View {
@@ -48,11 +55,13 @@ struct ComingSoonView: View {
 
 #Preview("Light") {
     RootView()
+        .environment(SessionCoordinator())
         .modelContainer(OrbitData.makePreviewContainer())
 }
 
 #Preview("Dark, English") {
     RootView()
+        .environment(SessionCoordinator())
         .modelContainer(OrbitData.makePreviewContainer())
         .environment(\.locale, Locale(identifier: "en_US"))
         .preferredColorScheme(.dark)
