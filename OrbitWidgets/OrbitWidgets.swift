@@ -1,47 +1,43 @@
-// Phase 0 spike widget — delete after the spike passes.
-import AppIntents
+// Placeholder so the extension has one widget; replaced by the Habit widget in Phase 2.
 import SwiftUI
 import WidgetKit
-import OrbitData
+import OrbitUI
 
-struct SpikeEntry: TimelineEntry {
+struct BrandEntry: TimelineEntry {
     let date: Date
-    let count: Int
 }
 
-struct SpikeProvider: TimelineProvider {
-    func placeholder(in context: Context) -> SpikeEntry { SpikeEntry(date: .now, count: 0) }
+struct BrandProvider: TimelineProvider {
+    func placeholder(in context: Context) -> BrandEntry { BrandEntry(date: .now) }
 
-    func getSnapshot(in context: Context, completion: @escaping (SpikeEntry) -> Void) {
-        completion(SpikeEntry(date: .now, count: OrbitData.spikeNoteCount()))
+    func getSnapshot(in context: Context, completion: @escaping (BrandEntry) -> Void) {
+        completion(BrandEntry(date: .now))
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SpikeEntry>) -> Void) {
-        completion(Timeline(entries: [SpikeEntry(date: .now, count: OrbitData.spikeNoteCount())], policy: .never))
+    func getTimeline(in context: Context, completion: @escaping (Timeline<BrandEntry>) -> Void) {
+        completion(Timeline(entries: [BrandEntry(date: .now)], policy: .never))
     }
 }
 
-struct OrbitWidgets: Widget {
+struct BrandWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SpikeKind.widget, provider: SpikeProvider()) { entry in
-            VStack(spacing: 8) {
-                Text("\(entry.count)")
-                    .font(.custom("InterTight-Black", size: 48, relativeTo: .largeTitle))
-                    .contentTransition(.numericText(value: Double(entry.count)))
-                Button(intent: AddSpikeNoteIntent()) {
-                    Image(systemName: "plus")
-                }
-                .invalidatableContent()
+        StaticConfiguration(kind: "OrbitBrand", provider: BrandProvider()) { _ in
+            VStack(alignment: .leading) {
+                OrbChip().fill(Color.orbit.accent).orbChipFrame(height: 14)
+                Spacer()
+                Text(verbatim: "Orbit").font(Typography.largeTitle).tracking(-0.6)
             }
-            .containerBackground(.fill.tertiary, for: .widget)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .containerBackground(Color.orbit.card, for: .widget)
         }
-        .configurationDisplayName("Orbit Spike")
+        .configurationDisplayName(Text(verbatim: "Orbit"))
+        .description(Text("widget.brand.description"))
         .supportedFamilies([.systemSmall])
     }
 }
 
 #Preview(as: .systemSmall) {
-    OrbitWidgets()
+    BrandWidget()
 } timeline: {
-    SpikeEntry(date: .now, count: 3)
+    BrandEntry(date: .now)
 }
