@@ -215,6 +215,10 @@ struct HabitFormView: View {
                                  reminderMinutes: reminders, sortOrder: nextSortOrder))
         }
         HabitRepository.save(context)
+        // First reminder ever → ask for permission (no-op if already decided).
+        if !reminders.isEmpty {
+            Task { await NotificationScheduler.requestAuthorization() }
+        }
         dismiss()
     }
 }

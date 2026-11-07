@@ -81,6 +81,7 @@ public enum HabitRepository {
             assertionFailure("Saving habits failed: \(error)")
         }
         WidgetKinds.reload(WidgetKinds.habits)
+        NotificationScheduler.requestReschedule()
     }
 
     /// Also drops it from `habit.logs` right away; SwiftData would otherwise keep it there until the next save.

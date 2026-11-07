@@ -8,16 +8,11 @@ public enum WidgetKinds {
     public static let habits = "HabitsWidget"
 
     public static func reload(_ kind: String) {
-        if canReload { WidgetCenter.shared.reloadTimelines(ofKind: kind) }
+        if OrbitData.isAppOrExtension { WidgetCenter.shared.reloadTimelines(ofKind: kind) }
     }
 
     public static func reloadAll() {
-        if canReload { WidgetCenter.shared.reloadAllTimelines() }
-    }
-
-    /// WidgetCenter crashes outside an app or extension bundle (e.g. `swift test` on the Mac).
-    private static var canReload: Bool {
-        ["app", "appex"].contains(Bundle.main.bundleURL.pathExtension)
+        if OrbitData.isAppOrExtension { WidgetCenter.shared.reloadAllTimelines() }
     }
 }
 

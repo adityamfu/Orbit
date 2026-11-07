@@ -7,6 +7,7 @@ import OrbitUI
 struct OrbitApp: App {
     @AppStorage(SettingsKey.language, store: .orbit) private var language = SettingsSnapshot.defaults.language
     @AppStorage(SettingsKey.appearance, store: .orbit) private var appearance = SettingsSnapshot.defaults.appearance
+    @Environment(\.scenePhase) private var scenePhase
 
     private let container: ModelContainer
 
@@ -26,6 +27,9 @@ struct OrbitApp: App {
                 .modelContainer(container)
                 .environment(\.locale, language.locale)
                 .onChange(of: appearance, initial: true) { _, value in apply(value) }
+                // Notifications follow the data and the app language (NTF rules: re-plan on open and on change).
+                .onChange(of: language) { NotificationScheduler.requestReschedule() }
+                .onChange(of: scenePhase) { _, phase in if phase == .active { NotificationScheduler.requestReschedule() } }
         }
     }
 

@@ -89,6 +89,7 @@ public enum BackupService {
         }
         backup.settings.write(to: defaults)
         WidgetKinds.reloadAll()
+        NotificationScheduler.requestReschedule()
     }
 
     private static func replaceAll(with backup: Backup, in context: ModelContext) throws {

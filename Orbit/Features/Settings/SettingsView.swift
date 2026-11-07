@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UserNotifications
 import UniformTypeIdentifiers
 import OrbitData
 import OrbitUI
@@ -22,6 +23,7 @@ struct SettingsView: View {
     /// 1 = first confirmation, 2 = final confirmation (SET-06 double confirm).
     @State private var importStep = 0
     @State private var importError: BackupImportError?
+    @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
 
     var body: some View {
         Form {
@@ -73,6 +75,14 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.navigationLink)
+
+                NavigationLink {
+                    NotificationSettingsView()
+                } label: {
+                    LabeledContent("settings.notifications") {
+                        Text(notificationStatus == .authorized ? "settings.notifications.short.on" : "settings.notifications.short.off")
+                    }
+                }
             }
 
             Section {
@@ -95,7 +105,12 @@ struct SettingsView: View {
                 }
             }
         }
+        // Title feeds the back button of pushed screens ("‹ Pengaturan"); the bar itself stays empty
+        // because the Inter Tight header above is the visible title.
+        .navigationTitle(Text("settings.title"))
+        .toolbar { ToolbarItem(placement: .principal) { Text(verbatim: "") } }
         .navigationBarTitleDisplayMode(.inline)
+        .task { notificationStatus = await NotificationScheduler.authorizationStatus() }
         .fileExporter(
             isPresented: $showExporter,
             document: exportDocument,
