@@ -1415,6 +1415,57 @@
         }
       }
     },
+    "intent.habit.increment": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add 1 to habit"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah 1 ke kebiasaan"
+          }
+        }
+      }
+    },
+    "intent.habit.parameter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Habit"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kebiasaan"
+          }
+        }
+      }
+    },
+    "intent.habit.toggle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check off habit"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Centang kebiasaan"
+          }
+        }
+      }
+    },
     "placeholder.description": {
       "extractionState": "manual",
       "localizations": {
@@ -1789,19 +1840,87 @@
         }
       }
     },
-    "widget.brand.description": {
+    "widget.habits.description": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The Orbit mark on your Home Screen."
+            "value": "Check off and +1 right from your Home Screen."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tanda Orbit di Home Screen."
+            "value": "Centang dan +1 langsung dari Home Screen."
+          }
+        }
+      }
+    },
+    "widget.habits.doneToday": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "done today"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "selesai hari ini"
+          }
+        }
+      }
+    },
+    "widget.habits.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No habits due today"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada kebiasaan hari ini"
+          }
+        }
+      }
+    },
+    "widget.habits.more %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld more"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld lagi"
+          }
+        }
+      }
+    },
+    "widget.habits.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's habits"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kebiasaan hari ini"
           }
         }
       }

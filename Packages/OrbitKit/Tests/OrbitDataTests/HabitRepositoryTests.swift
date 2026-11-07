@@ -84,3 +84,30 @@ struct HabitRepositoryTests {
         #expect(try ctx.fetchCount(FetchDescriptor<HabitLog>()) > 50)
     }
 }
+
+struct HabitWidgetSnapshotTests {
+    @Test func dueHabitsOnlyNotDoneFirst() throws {
+        let ctx = try freshContext()
+        let start = Date(timeIntervalSince1970: 0)
+        let a = Habit(name: "A", iconName: "star", startDate: start, sortOrder: 0)
+        let b = Habit(name: "B", iconName: "star", type: .count, targetCount: 3, startDate: start, sortOrder: 1)
+        let weekly = Habit(name: "W", iconName: "star", schedule: .timesPerWeek(3), startDate: start, sortOrder: 2)
+        let archived = Habit(name: "X", iconName: "star", startDate: start, isArchived: true)
+        [a, b, weekly, archived].forEach(ctx.insert)
+        let calc = HabitCalculator(firstWeekday: 2)
+        let date = DayKey.date(fromDay: 20261107)!
+        HabitRepository.toggle(a, day: 20261107, in: ctx)
+        HabitRepository.increment(b, day: 20261107, in: ctx)
+
+        let snap = HabitWidgetSnapshot.make(habits: [a, b, weekly, archived], calculator: calc, date: date)
+        #expect(snap.items.map(\.name) == ["B", "A"])
+        #expect(snap.done == 1)
+        #expect(snap.total == 2)
+        #expect(snap.items[0].value == 1)
+        #expect(snap.items[0].target == 3)
+
+        // A new day starts empty.
+        let tomorrow = HabitWidgetSnapshot.make(habits: [a, b], calculator: calc, date: DayKey.date(fromDay: 20261108)!)
+        #expect(tomorrow.done == 0)
+    }
+}

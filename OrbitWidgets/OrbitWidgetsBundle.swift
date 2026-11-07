@@ -7,6 +7,6 @@ struct OrbitWidgetsBundle: WidgetBundle {
     init() { OrbitFonts.register() }
 
     var body: some Widget {
-        BrandWidget()
+        HabitsWidget()
     }
 }

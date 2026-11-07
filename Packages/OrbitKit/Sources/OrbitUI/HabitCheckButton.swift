@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Trailing control of a habit row: check circle, skipped mark, or a +1 ring for count habits.
-public struct HabitCheckButton: View {
+/// The look of a habit's trailing control. Pure visual, so widgets can wrap it in `Button(intent:)`.
+public struct HabitCheckMark: View {
     public enum State: Equatable {
         case check(done: Bool)
         case count(value: Int, target: Int)
@@ -9,56 +9,74 @@ public struct HabitCheckButton: View {
     }
 
     let state: State
-    let label: Text
-    let action: () -> Void
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let size: CGFloat
 
-    /// `label` is the VoiceOver name of the action, e.g. "Mark done".
-    public init(_ state: State, label: Text, action: @escaping () -> Void) {
+    public init(_ state: State, size: CGFloat = 34) {
         self.state = state
-        self.label = label
-        self.action = action
+        self.size = size
     }
 
-    private var isDone: Bool {
+    public var body: some View {
+        ZStack {
+            switch state {
+            case .check(let done):
+                if done {
+                    Circle().fill(Color.orbit.accent)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: size * 0.42, weight: .bold))
+                        .foregroundStyle(Color.orbit.onAccent)
+                } else {
+                    Circle().strokeBorder(Color.secondary.opacity(0.45), lineWidth: 2)
+                }
+            case .count(let value, let target):
+                MiniRing(progress: Double(value) / Double(max(target, 1)), lineWidth: 3) {
+                    Image(systemName: value >= target ? "checkmark" : "plus")
+                        .font(.system(size: size * 0.42, weight: .bold))
+                        .foregroundStyle(Color.orbit.accent)
+                }
+            case .skipped:
+                Circle().fill(Color.orbit.iconTile)
+                Image(systemName: "forward.end")
+                    .font(.system(size: size * 0.32, weight: .bold))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: size, height: size)
+    }
+
+    var isDone: Bool {
         switch state {
         case .check(let done): done
         case .count(let value, let target): value >= target
         case .skipped: true
         }
     }
+}
+
+/// Trailing control of a habit row in the app: the check mark as a button, with haptics.
+public struct HabitCheckButton: View {
+    public typealias State = HabitCheckMark.State
+
+    let mark: HabitCheckMark
+    let label: Text
+    let action: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// `label` is the VoiceOver name of the action, e.g. "Mark done".
+    public init(_ state: State, label: Text, action: @escaping () -> Void) {
+        self.mark = HabitCheckMark(state)
+        self.label = label
+        self.action = action
+    }
 
     public var body: some View {
+        let isDone = mark.isDone
         Button(action: action) {
-            ZStack {
-                switch state {
-                case .check(let done):
-                    if done {
-                        Circle().fill(Color.orbit.accent)
-                        Image(systemName: "checkmark")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.orbit.onAccent)
-                    } else {
-                        Circle().strokeBorder(Color.secondary.opacity(0.45), lineWidth: 2)
-                    }
-                case .count(let value, let target):
-                    MiniRing(progress: Double(value) / Double(max(target, 1)), lineWidth: 3) {
-                        Image(systemName: value >= target ? "checkmark" : "plus")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.orbit.accent)
-                    }
-                case .skipped:
-                    Circle().fill(Color.orbit.iconTile)
-                    Image(systemName: "forward.end")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: 34, height: 34)
-            .scaleEffect(isDone && !reduceMotion ? 1 : 0.94)
-            .animation(reduceMotion ? nil : .spring(duration: 0.35, bounce: 0.4), value: isDone)
-            .frame(width: 44, height: 44)
-            .contentShape(.rect)
+            mark
+                .scaleEffect(isDone && !reduceMotion ? 1 : 0.94)
+                .animation(reduceMotion ? nil : .spring(duration: 0.35, bounce: 0.4), value: isDone)
+                .frame(width: 44, height: 44)
+                .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)

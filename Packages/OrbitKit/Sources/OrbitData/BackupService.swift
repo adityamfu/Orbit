@@ -88,6 +88,7 @@ public enum BackupService {
             throw error
         }
         backup.settings.write(to: defaults)
+        WidgetKinds.reloadAll()
     }
 
     private static func replaceAll(with backup: Backup, in context: ModelContext) throws {

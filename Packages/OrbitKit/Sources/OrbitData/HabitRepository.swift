@@ -80,6 +80,7 @@ public enum HabitRepository {
         } catch {
             assertionFailure("Saving habits failed: \(error)")
         }
+        WidgetKinds.reload(WidgetKinds.habits)
     }
 
     /// Also drops it from `habit.logs` right away; SwiftData would otherwise keep it there until the next save.
