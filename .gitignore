@@ -1,0 +1,17 @@
+# Docs & AI notes stay local (only README is published)
+*.md
+!README.md
+.claude/
+
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/
