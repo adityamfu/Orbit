@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import OrbitData
 import OrbitUI
@@ -72,6 +73,7 @@ struct ExpiryBanner: View {
 
 #Preview("Today") {
     TodayView()
+        .modelContainer(OrbitData.makePreviewContainer())
 }
 
 #Preview("Expiry banner") {

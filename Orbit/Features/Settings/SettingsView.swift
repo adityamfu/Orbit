@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 import OrbitData
@@ -12,6 +13,7 @@ struct SettingsView: View {
     /// Seconds since 1970; 0 = never backed up.
     @AppStorage(SettingsKey.lastBackupAt, store: .orbit) private var lastBackupAt: Double = 0
     @Environment(\.locale) private var locale
+    @Environment(\.modelContext) private var modelContext
 
     @State private var exportDocument: BackupDocument?
     @State private var showExporter = false
@@ -115,7 +117,11 @@ struct SettingsView: View {
         }
         .alert("backup.import.final.title", isPresented: step(2), presenting: pendingImport) { backup in
             Button("backup.import.final.confirm", role: .destructive) {
-                BackupService.restore(backup, into: .orbit)
+                do {
+                    try BackupService.restore(backup, into: .orbit, context: modelContext)
+                } catch {
+                    importError = .restore
+                }
                 pendingImport = nil
             }
             Button("common.cancel", role: .cancel) { pendingImport = nil }
@@ -127,6 +133,8 @@ struct SettingsView: View {
         } message: {
             if importError == .newer {
                 Text("backup.error.newer")
+            } else if importError == .restore {
+                Text("backup.error.restore")
             } else {
                 Text("backup.error.invalid")
             }
@@ -138,7 +146,7 @@ struct SettingsView: View {
     }
 
     private func export() {
-        guard let data = try? BackupService.export(from: .orbit) else { return }
+        guard let data = try? BackupService.export(from: .orbit, context: modelContext) else { return }
         exportDocument = BackupDocument(data: data)
         showExporter = true
     }
@@ -173,7 +181,7 @@ struct SettingsView: View {
     }
 }
 
-enum BackupImportError { case newer, invalid }
+enum BackupImportError { case newer, invalid, restore }
 
 /// JSON backup file for `.fileExporter`.
 nonisolated struct BackupDocument: FileDocument {
@@ -193,10 +201,12 @@ nonisolated struct BackupDocument: FileDocument {
 
 #Preview("Light") {
     NavigationStack { SettingsView() }
+        .modelContainer(OrbitData.makePreviewContainer())
 }
 
 #Preview("Dark, English, large type") {
     NavigationStack { SettingsView() }
+        .modelContainer(OrbitData.makePreviewContainer())
         .environment(\.locale, Locale(identifier: "en_US"))
         .preferredColorScheme(.dark)
         .dynamicTypeSize(.accessibility2)

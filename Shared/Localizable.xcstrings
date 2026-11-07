@@ -36,6 +36,23 @@
         }
       }
     },
+    "backup.error.restore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The backup couldn't be restored. Your data wasn't changed."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backup gagal dipulihkan. Data kamu tidak berubah."
+          }
+        }
+      }
+    },
     "backup.error.title": {
       "extractionState": "manual",
       "localizations": {

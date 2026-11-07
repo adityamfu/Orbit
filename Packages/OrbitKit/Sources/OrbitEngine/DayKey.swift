@@ -15,6 +15,12 @@ public enum DayKey {
         return calendar.date(from: comps)
     }
 
+    /// The key `days` days after (or before, if negative) `key`.
+    public static func adding(_ days: Int, to key: Int, calendar: Calendar = .current) -> Int {
+        let start = date(fromDay: key, calendar: calendar)!
+        return day(calendar.date(byAdding: .day, value: days, to: start)!, calendar: calendar)
+    }
+
     /// `yyyyWW` using ISO-style week numbering (min. 4 days in week 1) with a configurable first weekday
     /// (1 = Sunday … 7 = Saturday, as in `Calendar`). The year is the week-based year, so 31 Dec can be week 1.
     public static func week(_ date: Date, firstWeekday: Int, calendar: Calendar = .current) -> Int {

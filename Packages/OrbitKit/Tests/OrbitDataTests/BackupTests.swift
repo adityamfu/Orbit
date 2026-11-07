@@ -1,35 +1,70 @@
 import Foundation
+import SwiftData
 import Testing
+import OrbitEngine
 @testable import OrbitData
 
-struct BackupTests {
-    func freshDefaults() -> UserDefaults {
-        let name = "orbit-test-\(UUID().uuidString)"
-        let d = UserDefaults(suiteName: name)!
-        d.removePersistentDomain(forName: name)
-        return d
-    }
+func freshDefaults() -> UserDefaults {
+    let name = "orbit-test-\(UUID().uuidString)"
+    let d = UserDefaults(suiteName: name)!
+    d.removePersistentDomain(forName: name)
+    return d
+}
 
-    @Test func roundTripKeepsEverySetting() throws {
+func freshContext() throws -> ModelContext {
+    ModelContext(try OrbitData.makeContainer(inMemory: true))
+}
+
+struct BackupTests {
+    @Test func roundTripKeepsSettingsHabitsAndLogs() throws {
         let source = freshDefaults()
         let custom = SettingsSnapshot(language: .en, appearance: .dark, firstWeekday: 1, cycleStartDay: 25, weightIncrement: 1.25)
         custom.write(to: source)
+        let ctx = try freshContext()
+        let water = Habit(name: "Minum air", iconName: "drop", type: .count, targetCount: 8, unit: "gelas",
+                          schedule: .weekdays([2, 4]), reminderMinutes: [480, 1260], sortOrder: 1)
+        let cook = Habit(name: "Masak", iconName: "frying.pan", schedule: .timesPerWeek(3), isArchived: true)
+        ctx.insert(water)
+        ctx.insert(cook)
+        HabitRepository.setValue(5, for: water, day: 20261106, in: ctx)
+        HabitRepository.setSkipped(true, for: water, day: 20261105, calculator: HabitCalculator(firstWeekday: 2), in: ctx)
+        HabitRepository.toggle(cook, day: 20261104, in: ctx)
+        try ctx.save()
 
-        let data = try BackupService.export(from: source)
-        let target = freshDefaults()
-        BackupService.restore(try BackupService.read(data), into: target)
+        let data = try BackupService.export(from: source, context: ctx)
+        let targetDefaults = freshDefaults()
+        let targetCtx = try freshContext()
+        try BackupService.restore(try BackupService.read(data), into: targetDefaults, context: targetCtx)
 
-        #expect(SettingsSnapshot(from: target) == custom)
+        #expect(SettingsSnapshot(from: targetDefaults) == custom)
+        let again = try BackupService.read(BackupService.export(from: targetDefaults, context: targetCtx))
+        let first = try BackupService.read(data)
+        #expect(again.habits == first.habits)
+        #expect(first.habits.count == 2)
+        #expect(first.habits.first { $0.name == "Minum air" }?.logs.count == 2)
     }
 
-    @Test func emptyDefaultsExportDefaults() throws {
-        let backup = try BackupService.read(BackupService.export(from: freshDefaults()))
+    @Test func restoreReplacesExistingHabits() throws {
+        let ctx = try freshContext()
+        ctx.insert(Habit(name: "Lama", iconName: "star"))
+        try ctx.save()
+        let backup = Backup(exportedAt: .now, settings: .defaults, habits: [])
+        try BackupService.restore(backup, into: freshDefaults(), context: ctx)
+        #expect(try ctx.fetchCount(FetchDescriptor<Habit>()) == 0)
+    }
+
+    @Test func importsVersion1FilesWithoutHabits() throws {
+        let v1 = """
+        {"schemaVersion":1,"exportedAt":"2026-11-07T04:08:40Z",
+         "settings":{"appearance":"system","cycleStartDay":1,"firstWeekday":2,"language":"id","weightIncrement":2.5}}
+        """
+        let backup = try BackupService.read(Data(v1.utf8))
+        #expect(backup.habits.isEmpty)
         #expect(backup.settings == .defaults)
-        #expect(backup.schemaVersion == Backup.currentSchemaVersion)
     }
 
     @Test func rejectsNewerSchema() throws {
-        var backup = try BackupService.read(BackupService.export(from: freshDefaults()))
+        var backup = Backup(exportedAt: .now, settings: .defaults)
         backup.schemaVersion = Backup.currentSchemaVersion + 1
         let enc = JSONEncoder()
         enc.dateEncodingStrategy = .iso8601

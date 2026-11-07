@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import OrbitData
 import OrbitUI
@@ -7,11 +8,22 @@ struct OrbitApp: App {
     @AppStorage(SettingsKey.language, store: .orbit) private var language = SettingsSnapshot.defaults.language
     @AppStorage(SettingsKey.appearance, store: .orbit) private var appearance = SettingsSnapshot.defaults.appearance
 
-    init() { OrbitFonts.register() }
+    private let container: ModelContainer
+
+    init() {
+        OrbitFonts.register()
+        do {
+            container = try OrbitData.makeContainer()
+        } catch {
+            // Nothing works without the store; crash loudly in development rather than run with no data.
+            fatalError("Could not open the Orbit store: \(error)")
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
+                .modelContainer(container)
                 .environment(\.locale, language.locale)
                 .onChange(of: appearance, initial: true) { _, value in apply(value) }
         }

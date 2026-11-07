@@ -1,4 +1,6 @@
+import SwiftData
 import SwiftUI
+import OrbitData
 import OrbitUI
 
 /// Icon-only tab bar (DESIGN.md §4). Labels stay for VoiceOver.
@@ -46,10 +48,12 @@ struct ComingSoonView: View {
 
 #Preview("Light") {
     RootView()
+        .modelContainer(OrbitData.makePreviewContainer())
 }
 
 #Preview("Dark, English") {
     RootView()
+        .modelContainer(OrbitData.makePreviewContainer())
         .environment(\.locale, Locale(identifier: "en_US"))
         .preferredColorScheme(.dark)
 }
