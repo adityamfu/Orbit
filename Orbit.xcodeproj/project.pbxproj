@@ -423,7 +423,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit.widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -454,7 +454,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit.widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -614,7 +614,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Orbit membaca langkah dan workout dari Apple Health.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Orbit menyimpan sesi latihan ke Apple Health.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -651,7 +651,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Orbit membaca langkah dan workout dari Apple Health.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Orbit menyimpan sesi latihan ke Apple Health.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -673,7 +673,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -695,7 +695,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -716,7 +716,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -737,7 +737,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbit.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moondg.orbitapp.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

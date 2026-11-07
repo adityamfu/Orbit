@@ -8,7 +8,7 @@
 	<array/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.moondg.orbit</string>
+		<string>group.com.moondg.orbitapp</string>
 	</array>
 </dict>
 </plist>

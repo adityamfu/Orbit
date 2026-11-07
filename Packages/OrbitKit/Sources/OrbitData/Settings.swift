@@ -1,7 +1,7 @@
 import Foundation
 
 public enum OrbitData {
-    public static let appGroup = "group.com.moondg.orbit"
+    public static let appGroup = "group.com.moondg.orbitapp"
 }
 
 public extension UserDefaults {
