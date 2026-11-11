@@ -10,6 +10,7 @@ struct FinanceView: View {
     // ponytail: loads every transaction; fine for one person's data, fetch per period if it ever feels slow.
     @Query(sort: \FinanceTransaction.date, order: .reverse) private var transactions: [FinanceTransaction]
     @Query private var budgets: [Budget]
+    @Query(sort: \RecurringRule.startDate) private var allRecurringRules: [RecurringRule]
     @Environment(\.modelContext) private var context
     @Environment(\.locale) private var locale
     @AppStorage(SettingsKey.cycleStartDay, store: .orbit) private var cycleDay = SettingsSnapshot.defaults.cycleStartDay
@@ -20,10 +21,14 @@ struct FinanceView: View {
     @State private var showWallets = false
     @State private var showCategories = false
     @State private var showHistory = false
+    @State private var showRecurring = false
+    @State private var recurringDue: [RecurringRule] = []
+    @State private var editingBudget: Budget?
 
     var body: some View {
         let interval = Period.interval(period, cycleDay: cycleDay)
         let summary = PeriodSummary(transactions, in: interval)
+        let recurringRules = allRecurringRules.filter { $0.isActive }
 
         NavigationStack {
             ScrollView {
@@ -36,10 +41,15 @@ struct FinanceView: View {
                             financeAction("finance.wallets.title", "wallet.bifold") { showWallets = true }
                             financeAction("finance.categories.title", "folder") { showCategories = true }
                             financeAction("finance.history.title", "clock") { showHistory = true }
+                            financeAction("finance.recurring.title", "repeat") { showRecurring = true }
                         }
                     }
 
                     SummaryCard(period: $period, cycleDay: cycleDay, summary: summary)
+
+                    if !recurringDue.isEmpty {
+                        recurringDueCard
+                    }
 
                     if wallets.isEmpty {
                         ContentUnavailableView {
@@ -65,6 +75,11 @@ struct FinanceView: View {
             .sheet(isPresented: $showWallets) { NavigationStack { WalletListView() } }
             .sheet(isPresented: $showCategories) { NavigationStack { CategoryListView() } }
             .sheet(isPresented: $showHistory) { NavigationStack { TransactionHistoryView() } }
+            .sheet(isPresented: $showRecurring) { NavigationStack { RecurringRuleListView() } }
+            .sheet(item: $editingBudget) { budget in BudgetEditView(budget: budget) }
+            .task {
+                recurringDue = FinanceRepository.postRecurringRules(in: context)
+            }
             .onChange(of: cycleDay) { _, day in period = Period.key(.now, cycleDay: day) }
         }
     }
@@ -78,6 +93,70 @@ struct FinanceView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(key))
+    }
+
+    /// Confirmation card for recurring rules in confirm mode whose due date has passed (FIN-07).
+    private var recurringDueCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("finance.recurring.due.title").font(.headline)
+                Spacer()
+                Button("common.done") {
+                    recurringDue = []
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.orbit.accent)
+            }
+            ForEach(recurringDue) { rule in
+                HStack(spacing: 10) {
+                    Image(systemName: "repeat")
+                        .foregroundStyle(Color.orbit.iconTint)
+                        .frame(width: 32, height: 32)
+                        .background(Color.orbit.iconTile, in: .circle)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(verbatim: rule.note.isEmpty ? "finance.recurring.unnamed" : rule.note)
+                            .font(.body.weight(.medium))
+                        Text(verbatim: "\(Rupiah.format(rule.amount)) · \(modeText(rule))")
+                            .font(.caption)
+                            .foregroundStyle(Color.orbit.textSecondary)
+                    }
+                    Spacer()
+                    Button("finance.recurring.post") {
+                        postRule(rule)
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.orbit.accent)
+                    Button("finance.recurring.skip") {
+                        skipRule(rule)
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.orbit.textSecondary)
+                }
+                .padding(10)
+                .background(Color.orbit.card, in: .rect(cornerRadius: 12, style: .continuous))
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func modeText(_ rule: RecurringRule) -> String {
+        rule.mode == .auto
+            ? String(localized: "finance.recurring.mode.auto", defaultValue: "Auto")
+            : String(localized: "finance.recurring.mode.confirm", defaultValue: "Confirm")
+    }
+
+    private func postRule(_ rule: RecurringRule) {
+        FinanceRepository.postRecurringRules(in: context)
+        recurringDue = FinanceRepository.postRecurringRules(in: context)
+    }
+
+    private func skipRule(_ rule: RecurringRule) {
+        let recurrence = Recurrence(rule.frequency)
+        let (_, next) = recurrence.due(from: rule.nextDueDate, through: .now)
+        rule.nextDueDate = next
+        rule.updatedAt = .now
+        FinanceRepository.save(context)
+        recurringDue = FinanceRepository.postRecurringRules(in: context)
     }
 
     // MARK: Sections
@@ -131,7 +210,9 @@ struct FinanceView: View {
                 VStack(spacing: 0) {
                     ForEach(current) { budget in
                         BudgetRow(budget: budget, spent: summary.spentByCategory[budget.categoryID] ?? 0,
-                                  elapsed: elapsed, showMarker: thisPeriod)
+                                  elapsed: elapsed, showMarker: thisPeriod) {
+                            editingBudget = budget
+                        }
                         if budget.id != current.last?.id { Divider() }
                     }
                 }
@@ -295,6 +376,7 @@ struct BudgetRow: View {
     let spent: Int64
     let elapsed: Double
     let showMarker: Bool
+    let onEdit: () -> Void
 
     var body: some View {
         let status = BudgetStatus(spent: spent, limit: budget.limit, elapsed: elapsed)
@@ -323,7 +405,10 @@ struct BudgetRow: View {
                 .foregroundStyle(Color.orbit.textSecondary)
         }
         .padding(.vertical, 12)
+        .contentShape(.rect)
+        .onTapGesture(perform: onEdit)
         .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
     }
 }
 

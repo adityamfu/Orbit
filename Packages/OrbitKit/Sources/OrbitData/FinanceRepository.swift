@@ -70,6 +70,13 @@ public enum FinanceRepository {
         return c
     }
 
+    /// Used recurring rules are archived by deactivating, never deleted (CLAUDE.md data rule).
+    public static func setArchived(_ archived: Bool, _ rule: RecurringRule) {
+        rule.isActive = !archived
+        rule.updatedAt = .now
+        rule.modelContext.map(save)
+    }
+
     public static func save(_ context: ModelContext) {
         do {
             try context.save()
@@ -77,6 +84,54 @@ public enum FinanceRepository {
             assertionFailure("Saving finance failed: \(error)")
         }
     }
+
+    /// FIN-07: Post recurring rules whose `nextDueDate` has passed.
+    /// - Auto mode: posts a transaction for every missed due date, then advances `nextDueDate`.
+    /// - Confirm mode: does not post; returns the rule so the UI can surface a confirmation card.
+    /// Returns confirm-mode rules awaiting the user's decision.
+    @discardableResult
+    public static func postRecurringRules(in context: ModelContext) -> [RecurringRule] {
+        let rules = (try? context.fetch(FetchDescriptor<RecurringRule>(
+            predicate: #Predicate { $0.isActive }
+        ))) ?? []
+        let now = Date.now
+        var awaiting: [RecurringRule] = []
+        var changed = false
+
+        for rule in rules where rule.nextDueDate <= now {
+            let recurrence = Recurrence(rule.frequency)
+            let (dates, next) = recurrence.due(from: rule.nextDueDate, through: now)
+
+            if rule.mode == .auto {
+                let allWallets = (try? context.fetch(FetchDescriptor<Wallet>())) ?? []
+                guard let wallet = allWallets.first(where: { $0.id == rule.walletID }) else { continue }
+                let kind = rule.kind
+                let toWallet: Wallet? = rule.toWalletID.flatMap { id in
+                    allWallets.first { $0.id == id }
+                }
+                let allCategories = (try? context.fetch(FetchDescriptor<MoneyCategory>())) ?? []
+                let category: MoneyCategory? = rule.categoryID.flatMap { id in
+                    allCategories.first { $0.id == id }
+                }
+                for date in dates {
+                    let t = add(kind: kind, amount: rule.amount, wallet: wallet,
+                                toWallet: kind == .transfer ? toWallet : nil,
+                                category: kind == .transfer ? nil : category,
+                                date: date, note: rule.note, in: context)
+                    t.recurringRuleID = rule.id
+                }
+            } else {
+                awaiting.append(rule)
+            }
+            rule.nextDueDate = next
+            rule.updatedAt = .now
+            changed = true
+        }
+
+        if changed { save(context) }
+        return awaiting
+    }
+
 }
 
 /// Totals for one budget period (summary card, budgets).
