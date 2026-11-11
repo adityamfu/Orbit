@@ -22,6 +22,7 @@ struct FinanceView: View {
     @State private var showCategories = false
     @State private var showHistory = false
     @State private var showRecurring = false
+    @State private var showReport = false
     @State private var recurringDue: [RecurringRule] = []
     @State private var editingBudget: Budget?
 
@@ -42,6 +43,7 @@ struct FinanceView: View {
                             financeAction("finance.categories.title", "folder") { showCategories = true }
                             financeAction("finance.history.title", "clock") { showHistory = true }
                             financeAction("finance.recurring.title", "repeat") { showRecurring = true }
+                            financeAction("finance.report.title", "chart.pie") { showReport = true }
                         }
                     }
 
@@ -76,6 +78,7 @@ struct FinanceView: View {
             .sheet(isPresented: $showCategories) { NavigationStack { CategoryListView() } }
             .sheet(isPresented: $showHistory) { NavigationStack { TransactionHistoryView() } }
             .sheet(isPresented: $showRecurring) { NavigationStack { RecurringRuleListView() } }
+            .sheet(isPresented: $showReport) { NavigationStack { MonthlyReportView() } }
             .sheet(item: $editingBudget) { budget in BudgetEditView(budget: budget) }
             .task {
                 recurringDue = FinanceRepository.postRecurringRules(in: context)
