@@ -54,7 +54,7 @@ final class SessionCoordinator {
         touch()
     }
 
-    func finish(context: ModelContext) {
+    func finish(context: ModelContext) async {
         guard let session else { return }
         // Read everything before finishing: with nothing ticked the session gets deleted.
         let title = session.template?.name
@@ -62,7 +62,7 @@ final class SessionCoordinator {
         let done = session.sets.filter(\.isCompleted).map(\.record)
         let finished = !done.isEmpty
         let end = Date.now
-        let records = SessionRepository.finish(session, history: history(context), in: context, now: end)
+        let records = await SessionRepository.finish(session, history: history(context), in: context, now: end)
         summary = finished
             ? FinishedSession(title: title, summary: SessionSummary(start: start, end: end, sets: done), records: records)
             : nil

@@ -87,7 +87,7 @@ struct ActiveSessionView: View {
             .preferredColorScheme(.dark)
         }
         .confirmationDialog("session.finish.title", isPresented: $confirmFinish, titleVisibility: .visible) {
-            Button("session.finish") { coordinator.finish(context: context) }
+            Button("session.finish") { Task { await coordinator.finish(context: context) } }
         } message: {
             if done == 0 {
                 Text("session.finish.nothing")

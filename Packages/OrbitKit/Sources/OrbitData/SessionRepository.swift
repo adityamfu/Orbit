@@ -109,8 +109,9 @@ public enum SessionRepository {
     /// Ends the session: drops unticked sets, stamps the end, and reports new records.
     /// A session with nothing ticked is discarded instead.
     @discardableResult
+    @MainActor
     public static func finish(_ session: WorkoutSession, history: [WorkoutSession], in context: ModelContext,
-                              now: Date = .now) -> [SessionRecord] {
+                              now: Date = .now) async -> [SessionRecord] {
         for set in session.sets where !set.isCompleted {
             session.sets.removeAll { $0.persistentModelID == set.persistentModelID }
             context.delete(set)
@@ -124,7 +125,8 @@ public enum SessionRepository {
         session.updatedAt = now
         save(context)
         // HLT-02: save finished session to Apple Health (no-op if permission denied / not available).
-        HealthKitService.shared.save(session: session, context: context)
+        // Awaited here; never blocks the UI thread because the caller runs in a Task.
+        await HealthKitService.shared.save(session: session, context: context)
         return records(for: session, history: history)
     }
 

@@ -7,6 +7,49 @@
     "—" : {
 
     },
+    "%@ – %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld / %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld %3$@"
+          }
+        }
+      }
+    },
+    "%lld latihan" : {
+
+    },
+    "%lld–%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld–%2$lld"
+          }
+        }
+      }
+    },
     "%lld%%" : {
 
     },
@@ -777,6 +820,9 @@
       }
     },
     "Date" : {
+
+    },
+    "English" : {
 
     },
     "equipment.barbell" : {
@@ -4970,6 +5016,9 @@
         }
       }
     },
+    "habits.action.increment" : {
+
+    },
     "habits.action.reset" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5243,6 +5292,9 @@
       }
     },
     "Income" : {
+
+    },
+    "Indonesia" : {
 
     },
     "insight.highlight.pr" : {
@@ -5824,6 +5876,244 @@
         }
       }
     },
+    "onboarding.done.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Orbit is ready. Start tracking habits, workouts, and money."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orbit kamu siap digunakan. Mulai catat kebiasaan, latihan, dan uang."
+          }
+        }
+      }
+    },
+    "onboarding.done.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All set"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siap"
+          }
+        }
+      }
+    },
+    "onboarding.habits" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starter habits"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kebiasaan awal"
+          }
+        }
+      }
+    },
+    "onboarding.habits.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick habits to start with. You can add or change them later."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih kebiasaan untuk dimulai. Tambah atau ubah nanti."
+          }
+        }
+      }
+    },
+    "onboarding.language" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bahasa"
+          }
+        }
+      }
+    },
+    "onboarding.language.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose your language. This applies to the whole app, widgets, and notifications."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih bahasa. Berlaku untuk seluruh app, widget, dan notifikasi."
+          }
+        }
+      }
+    },
+    "onboarding.routine" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workout program"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Program latihan"
+          }
+        }
+      }
+    },
+    "onboarding.routine.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a starter routine, or skip to add workouts manually later."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih program starter, atau lewati untuk latihan manual nanti."
+          }
+        }
+      }
+    },
+    "onboarding.routine.skip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip for now"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lewati dulu"
+          }
+        }
+      }
+    },
+    "onboarding.wallet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First wallet"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dompet pertama"
+          }
+        }
+      }
+    },
+    "onboarding.wallet.balance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting balance"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo awal"
+          }
+        }
+      }
+    },
+    "onboarding.wallet.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add your first wallet to start tracking money. You can add more later."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah dompet pertama untuk mulai mencatat uang. Tambah lagi kapan saja."
+          }
+        }
+      }
+    },
+    "onboarding.wallet.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet name"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nama dompet"
+          }
+        }
+      }
+    },
+    "onboarding.wallet.type" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipe"
+          }
+        }
+      }
+    },
     "placeholder.description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5891,6 +6181,9 @@
           }
         }
       }
+    },
+    "routine.%@" : {
+
     },
     "routine.form.addExercise" : {
       "extractionState" : "manual",
@@ -6312,6 +6605,23 @@
         }
       }
     },
+    "routine.pushPullLegs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Push / Pull / Legs"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Push / Pull / Legs"
+          }
+        }
+      }
+    },
     "routine.upper" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6325,6 +6635,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upper"
+          }
+        }
+      }
+    },
+    "routine.upperLower" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upper / Lower"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upper / Lower"
           }
         }
       }
@@ -7616,6 +7943,9 @@
         }
       }
     },
+    "streak %lld" : {
+
+    },
     "tab.finance" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7684,308 +8014,19 @@
         }
       }
     },
-    "tab.workout" : {
+    "tab.today.habits" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Workout"
+            "value" : "Habits today"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Latihan"
-          }
-        }
-      }
-    },
-    "onboarding.language" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bahasa"
-          }
-        }
-      }
-    },
-    "onboarding.language.desc" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose your language. This applies to the whole app, widgets, and notifications."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value": "Pilih bahasa. Berlaku untuk seluruh app, widget, dan notifikasi."
-          }
-        }
-      }
-    },
-    "onboarding.wallet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First wallet"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dompet pertama"
-          }
-        }
-      }
-    },
-    "onboarding.wallet.desc" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add your first wallet to start tracking money. You can add more later."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value": "Tambah dompet pertama untuk mulai mencatat uang. Tambah lagi kapan saja."
-          }
-        }
-      }
-    },
-    "onboarding.wallet.name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wallet name"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nama dompet"
-          }
-        }
-      }
-    },
-    "onboarding.wallet.type" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipe"
-          }
-        }
-      }
-    },
-    "onboarding.wallet.balance" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Starting balance"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saldo awal"
-          }
-        }
-      }
-    },
-    "onboarding.habits" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Starter habits"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kebiasaan awal"
-          }
-        }
-      }
-    },
-    "onboarding.habits.desc" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pick habits to start with. You can add or change them later."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value": "Pilih kebiasaan untuk dimulai. Tambah atau ubah nanti."
-          }
-        }
-      }
-    },
-    "onboarding.routine" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workout program"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Program latihan"
-          }
-        }
-      }
-    },
-    "onboarding.routine.desc" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a starter routine, or skip to add workouts manually later."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value": "Pilih program starter, atau lewati untuk latihan manual nanti."
-          }
-        }
-      }
-    },
-    "onboarding.routine.skip" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skip for now"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lewati dulu"
-          }
-        }
-      }
-    },
-    "onboarding.done.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All set"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Siap"
-          }
-        }
-      }
-    },
-    "onboarding.done.desc" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your Orbit is ready. Start tracking habits, workouts, and money."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value": "Orbit kamu siap digunakan. Mulai catat kebiasaan, latihan, dan uang."
-          }
-        }
-      }
-    },
-    "routine.pushPullLegs" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Push / Pull / Legs"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Push / Pull / Legs"
-          }
-        }
-      }
-    },
-    "routine.upperLower" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upper / Lower"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upper / Lower"
-          }
-        }
-      }
-    },
-    "routine.fullBody" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full Body"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full Body"
+            "value" : "Kebiasaan hari ini"
           }
         }
       }
@@ -8007,19 +8048,121 @@
         }
       }
     },
-    "tab.today.habits" : {
+    "tab.today.start" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Habits today"
+            "value" : "Start workout"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kebiasaan hari ini"
+            "value" : "Mulai latihan"
+          }
+        }
+      }
+    },
+    "tab.today.stats.checkins" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check-ins"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check-in"
+          }
+        }
+      }
+    },
+    "tab.today.stats.streak" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streak"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streak"
+          }
+        }
+      }
+    },
+    "tab.today.stats.target" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Target"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Target"
+          }
+        }
+      }
+    },
+    "tab.today.stats.target.sub" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "weekly target achievement"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pencapaian target minggu"
+          }
+        }
+      }
+    },
+    "tab.today.stats.workouts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workouts"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latihan"
+          }
+        }
+      }
+    },
+    "tab.today.stats.workouts.sub" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sessions this week"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sesi minggu ini"
           }
         }
       }
@@ -8070,126 +8213,24 @@
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value": "Pilih program untuk memulai."
+            "value" : "Pilih program untuk memulai."
           }
         }
       }
     },
-    "tab.today.start" : {
+    "tab.workout" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start workout"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mulai latihan"
-          }
-        }
-      }
-    },
-    "tab.today.stats.streak" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Streak"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Streak"
-          }
-        }
-      }
-    },
-    "tab.today.stats.checkins" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-ins"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-in"
-          }
-        }
-      }
-    },
-    "tab.today.stats.workouts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workouts"
+            "value" : "Workout"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Latihan"
-          }
-        }
-      }
-    },
-    "tab.today.stats.workouts.sub" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sessions this week"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sesi minggu ini"
-          }
-        }
-      }
-    },
-    "tab.today.stats.target" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Target"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Target"
-          }
-        }
-      }
-    },
-    "tab.today.stats.target.sub" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "weekly target achievement"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pencapaian target minggu"
           }
         }
       }

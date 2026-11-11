@@ -4,6 +4,7 @@ import Testing
 import OrbitEngine
 @testable import OrbitData
 
+@MainActor
 struct SessionRepositoryTests {
     func setup() throws -> (ModelContext, RoutineTemplate) {
         let ctx = try freshContext()
@@ -14,7 +15,8 @@ struct SessionRepositoryTests {
     func all(_ ctx: ModelContext) throws -> [WorkoutSession] { try ctx.fetch(FetchDescriptor<WorkoutSession>()) }
 
     /// Runs a full Push session ticking every set with the given bench reps.
-    func runSession(_ ctx: ModelContext, _ routine: RoutineTemplate, benchReps: Int, at day: Int) throws -> [SessionRecord] {
+    @MainActor
+    func runSession(_ ctx: ModelContext, _ routine: RoutineTemplate, benchReps: Int, at day: Int) async throws -> [SessionRecord] {
         let start = Date(timeIntervalSince1970: TimeInterval(day) * 86_400)
         let s = SessionRepository.start(template: routine, history: try all(ctx), increment: 2.5, in: ctx, now: start)
         for entry in SessionRepository.exercises(in: s) {
@@ -23,7 +25,7 @@ struct SessionRepositoryTests {
                 SessionRepository.setCompleted(set, true, in: ctx, now: start)
             }
         }
-        return SessionRepository.finish(s, history: try all(ctx), in: ctx, now: start.addingTimeInterval(3_600))
+        return await SessionRepository.finish(s, history: try all(ctx), in: ctx, now: start.addingTimeInterval(3_600))
     }
 
     @Test func startPrefillsFromRoutine() throws {
@@ -38,9 +40,10 @@ struct SessionRepositoryTests {
         #expect(SessionRepository.activeSession(in: ctx)?.id == s.id)
     }
 
-    @Test func nextSessionUsesSuggestionAndPrevious() throws {
+    @Test @MainActor
+    func nextSessionUsesSuggestionAndPrevious() async throws {
         let (ctx, routine) = try setup()
-        _ = try runSession(ctx, routine, benchReps: 12, at: 1)  // all sets hit 12 at 60 kg
+        _ = try await runSession(ctx, routine, benchReps: 12, at: 1)  // all sets hit 12 at 60 kg
         let next = SessionRepository.start(template: routine, history: try all(ctx), increment: 2.5, in: ctx,
                                            now: Date(timeIntervalSince1970: 3 * 86_400))
         let bench = SessionRepository.exercises(in: next)[0]
@@ -50,25 +53,27 @@ struct SessionRepositoryTests {
         #expect(previous.first?.weightKg == 60)
     }
 
-    @Test func finishDropsUntickedSetsAndReportsRecords() throws {
+    @Test @MainActor
+    func finishDropsUntickedSetsAndReportsRecords() async throws {
         let (ctx, routine) = try setup()
-        #expect(try runSession(ctx, routine, benchReps: 10, at: 1).isEmpty)  // first session: nothing to beat
+        #expect((try await runSession(ctx, routine, benchReps: 10, at: 1)).isEmpty)  // first session: nothing to beat
 
         let start = Date(timeIntervalSince1970: 5 * 86_400)
         let s = SessionRepository.start(template: routine, history: try all(ctx), increment: 2.5, in: ctx, now: start)
         let bench = SessionRepository.exercises(in: s)[0]
         bench.sets[0].reps = 12
         SessionRepository.setCompleted(bench.sets[0], true, in: ctx)  // only one set ticked
-        let records = SessionRepository.finish(s, history: try all(ctx), in: ctx, now: start.addingTimeInterval(1_800))
+        let records = await SessionRepository.finish(s, history: try all(ctx), in: ctx, now: start.addingTimeInterval(1_800))
         #expect(s.sets.count == 1)
         #expect(s.endedAt != nil)
         #expect(records.first?.kinds.contains(.e1RM) == true)  // 60 × 12 beats 60 × 10
     }
 
-    @Test func emptyFinishDiscards() throws {
+    @Test @MainActor
+    func emptyFinishDiscards() async throws {
         let (ctx, routine) = try setup()
         let s = SessionRepository.start(template: routine, history: [], increment: 2.5, in: ctx)
-        SessionRepository.finish(s, history: [], in: ctx)
+        await SessionRepository.finish(s, history: [], in: ctx)
         #expect(try all(ctx).isEmpty)
     }
 

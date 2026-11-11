@@ -7,12 +7,13 @@ import HealthKit
 #endif
 
 /// Apple Health bridge (PRD §4.6 HLT-01–05). Offline-first: the app works fully without Health permission.
+/// Runs on MainActor like the rest of the app, so no actor hopping / data races.
+@MainActor
 public final class HealthKitService: Sendable {
     public static let shared = HealthKitService()
 
 #if canImport(HealthKit)
     private let store = HKHealthStore()
-    private let queue = DispatchQueue(label: "orbit.healthkit", qos: .utility)
 
     /// Metadata key Orbit stamps on every HKWorkout so we can dedupe imports (PRD HLT-03).
     private static let orbitSourceUUIDKey = "orbit.sourceUUID"
@@ -52,26 +53,24 @@ public final class HealthKitService: Sendable {
     // MARK: - Write (HLT-02)
 
     /// Save a finished Orbit session to Apple Health as an HKWorkout (PRD HLT-02).
-    /// Returns the HealthKit UUID stamped on the workout, or nil if permission denied / not available.
-    public func save(session: WorkoutSession, context: ModelContext) -> UUID? {
+    /// Fire-and-forget: never blocks the caller. Returns the HealthKit UUID, or nil if not authorized.
+    public func save(session: WorkoutSession, context: ModelContext) async -> UUID? {
         guard isAvailable, authorizationStatus == 2 else { return nil } // .sharingAuthorized
         let sourceUUID = UUID()
         let workout = HKWorkout(activityType: activityType(session), start: session.startedAt,
                                 end: session.endedAt ?? .now)
-        var error: Error?
-        let semaphore = DispatchSemaphore(value: 0)
-        store.save(workout) { _, saveError in
-            error = saveError
-            semaphore.signal()
+        return await withCheckedContinuation { continuation in
+            store.save(workout) { _, saveError in
+                if saveError != nil {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                session.healthKitUUID = sourceUUID
+                session.sourceRaw = WorkoutSource.orbit.rawValue
+                try? context.save()
+                continuation.resume(returning: sourceUUID)
+            }
         }
-        semaphore.wait()
-        if error != nil { return nil }
-
-        // Stamp the session so we know it's synced and don't re-upload.
-        session.healthKitUUID = sourceUUID
-        session.sourceRaw = WorkoutSource.orbit.rawValue
-        try? context.save()
-        return sourceUUID
     }
 
     private func activityType(_ session: WorkoutSession) -> HKWorkoutActivityType {
@@ -84,40 +83,43 @@ public final class HealthKitService: Sendable {
 
     // MARK: - Read / Import (HLT-01, HLT-03)
 
-    /// Import workouts from Apple Health that Orbit hasn't seen yet (deduped by orbitSourceUUID).
+    /// Import workouts from Apple Health that Orbit hasn't seen yet (deduped by start date + source).
     /// New workouts are inserted as `source = .health` so they get the "Apple Health" badge in history.
-    public func importWorkouts(into context: ModelContext) -> Int {
+    /// Fire-and-forget: never blocks the caller.
+    public func importWorkouts(into context: ModelContext) async -> Int {
         guard isAvailable, authorizationStatus == 2 else { return 0 } // .sharingAuthorized
         let workoutType = HKObjectType.workoutType()
         let predicate = HKQuery.predicateForSamples(withStart: Date.distantPast, end: Date.now,
                                                     options: .strictStartDate)
-        var imported = 0
-        let semaphore = DispatchSemaphore(value: 0)
-        let query = HKSampleQuery(sampleType: workoutType, predicate: predicate, limit: HKObjectQueryNoLimit,
-                                  sortDescriptors: nil) { _, samples, _ in
-            guard let workouts = samples as? [HKWorkout] else { semaphore.signal(); return }
-            let known = (try? context.fetch(FetchDescriptor<WorkoutSession>())) ?? []
-            for workout in workouts {
-                // Dedupe: skip if we already imported this exact workout (same start + source=health).
-                let alreadyImported = known.contains { s in
-                    s.sourceRaw == WorkoutSource.health.rawValue
-                        && s.startedAt.timeIntervalSince1970 == workout.startDate.timeIntervalSince1970
+        return await withCheckedContinuation { continuation in
+            let query = HKSampleQuery(sampleType: workoutType, predicate: predicate, limit: HKObjectQueryNoLimit,
+                                      sortDescriptors: nil) { _, samples, _ in
+                guard let workouts = samples as? [HKWorkout] else {
+                    continuation.resume(returning: 0)
+                    return
                 }
-                if alreadyImported { continue }
-                let session = WorkoutSession(startedAt: workout.startDate, source: .health,
-                                             activityType: "strength")
-                session.endedAt = workout.endDate
-                session.healthKitUUID = workout.uuid
-                session.note = "Impor dari Apple Health"
-                context.insert(session)
-                imported += 1
+                let known = (try? context.fetch(FetchDescriptor<WorkoutSession>())) ?? []
+                var imported = 0
+                for workout in workouts {
+                    // Dedupe: skip if we already imported this exact workout (same start + source=health).
+                    let alreadyImported = known.contains { s in
+                        s.sourceRaw == WorkoutSource.health.rawValue
+                            && s.startedAt.timeIntervalSince1970 == workout.startDate.timeIntervalSince1970
+                    }
+                    if alreadyImported { continue }
+                    let session = WorkoutSession(startedAt: workout.startDate, source: .health,
+                                                 activityType: "strength")
+                    session.endedAt = workout.endDate
+                    session.healthKitUUID = workout.uuid
+                    session.note = "Impor dari Apple Health"
+                    context.insert(session)
+                    imported += 1
+                }
+                try? context.save()
+                continuation.resume(returning: imported)
             }
-            try? context.save()
-            semaphore.signal()
+            store.execute(query)
         }
-        store.execute(query)
-        semaphore.wait()
-        return imported
     }
 
     /// Read step count for a date range (HLT-01). Returns total steps, or nil if not authorized.

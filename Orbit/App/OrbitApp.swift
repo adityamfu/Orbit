@@ -66,7 +66,7 @@ struct OrbitApp: App {
                 .task {
                     if HealthKitService.shared.isAvailable {
                         try? await HealthKitService.shared.requestAuthorization()
-                        _ = HealthKitService.shared.importWorkouts(into: container.mainContext)
+                        _ = await HealthKitService.shared.importWorkouts(into: container.mainContext)
                     }
                 }
                 .onChange(of: scenePhase) { _, phase in
@@ -75,7 +75,7 @@ struct OrbitApp: App {
                         if HealthKitService.shared.isAvailable {
                             Task {
                                 try? await HealthKitService.shared.requestAuthorization()
-                                _ = HealthKitService.shared.importWorkouts(into: container.mainContext)
+                                _ = await HealthKitService.shared.importWorkouts(into: container.mainContext)
                             }
                         }
                     }
