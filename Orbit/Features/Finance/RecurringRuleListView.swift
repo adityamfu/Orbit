@@ -106,7 +106,7 @@ struct RecurringRuleListView: View {
         case .monthly(let d):
             return String(localized: "finance.recurring.freq.monthly", defaultValue: "Monthly on day \(d)")
         case .weekly(let w):
-            var cal = Calendar(identifier: .gregorian)
+            let cal = Calendar(identifier: .gregorian)
             let sym = cal.veryShortStandaloneWeekdaySymbols[w - 1]
             return String(localized: "finance.recurring.freq.weekly", defaultValue: "Weekly on \(sym)")
         case .yearly(let m, let d):

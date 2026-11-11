@@ -170,7 +170,7 @@ struct RecurringRuleFormView: View {
     }
 
     private var canSave: Bool {
-        guard let walletID, let wallet = wallets.first(where: { $0.id == walletID }),
+        guard let walletID, wallets.contains(where: { $0.id == walletID }),
               let amount = Int64(self.amount.filter(\.isNumber)), amount > 0 else { return false }
         if kind == .transfer {
             return toWalletID.map { $0 != walletID } ?? false

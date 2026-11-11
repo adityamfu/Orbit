@@ -35,9 +35,6 @@ struct TodayView: View {
     }
 
     var body: some View {
-        let habitInputs = habits.map { ($0.rule(), logsByHabit[$0.id] ?? [:]) }
-        let todaysProgress = calc.dayProgress(habitInputs, on: today)
-
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {

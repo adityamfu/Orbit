@@ -29,7 +29,6 @@ struct FinanceView: View {
     var body: some View {
         let interval = Period.interval(period, cycleDay: cycleDay)
         let summary = PeriodSummary(transactions, in: interval)
-        let recurringRules = allRecurringRules.filter { $0.isActive }
 
         NavigationStack {
             ScrollView {

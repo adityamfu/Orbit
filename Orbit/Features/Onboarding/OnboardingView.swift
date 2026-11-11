@@ -188,7 +188,7 @@ struct OnboardingView: View {
             let wallet = Wallet(name: walletName.trimmingCharacters(in: .whitespaces),
                                 type: walletType, initialBalance: balance, sortOrder: 0)
             context.insert(wallet)
-            try? CategoryLibrary.seedIfNeeded(context) // built-in categories
+            _ = try? CategoryLibrary.seedIfNeeded(context) // built-in categories
             // Budgets for starter categories this period.
             let period = Period.key(.now, cycleDay: SettingsSnapshot(from: .orbit).cycleStartDay)
             for key in ["category.food", "category.transport"] {
@@ -209,7 +209,7 @@ struct OnboardingView: View {
         }
         // Routine.
         if let program = selectedProgram {
-            try? program.install(in: context, language: language)
+            _ = try? program.install(in: context, language: language)
         }
         try? context.save()
         firstLaunch = false
