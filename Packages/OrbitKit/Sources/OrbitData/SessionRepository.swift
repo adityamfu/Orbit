@@ -126,7 +126,7 @@ public enum SessionRepository {
         save(context)
         // HLT-02: save finished session to Apple Health (no-op if permission denied / not available).
         // Awaited here; never blocks the UI thread because the caller runs in a Task.
-        await HealthKitService.shared.save(session: session, context: context)
+        _ = await HealthKitService.shared.save(session: session, context: context)
         return records(for: session, history: history)
     }
 

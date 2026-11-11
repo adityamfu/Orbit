@@ -59,18 +59,15 @@ public final class HealthKitService: Sendable {
         let sourceUUID = UUID()
         let workout = HKWorkout(activityType: activityType(session), start: session.startedAt,
                                 end: session.endedAt ?? .now)
-        return await withCheckedContinuation { continuation in
-            store.save(workout) { _, saveError in
-                if saveError != nil {
-                    continuation.resume(returning: nil)
-                    return
-                }
-                session.healthKitUUID = sourceUUID
-                session.sourceRaw = WorkoutSource.orbit.rawValue
-                try? context.save()
-                continuation.resume(returning: sourceUUID)
-            }
+        // HealthKit answers on a background queue. Only a Bool crosses back; SwiftData stays on MainActor.
+        let saved = await withCheckedContinuation { continuation in
+            store.save(workout) { success, _ in continuation.resume(returning: success) }
         }
+        guard saved else { return nil }
+        session.healthKitUUID = sourceUUID
+        session.sourceRaw = WorkoutSource.orbit.rawValue
+        try? context.save()
+        return sourceUUID
     }
 
     private func activityType(_ session: WorkoutSession) -> HKWorkoutActivityType {
@@ -83,6 +80,13 @@ public final class HealthKitService: Sendable {
 
     // MARK: - Read / Import (HLT-01, HLT-03)
 
+    /// Sendable copy of an HKWorkout; HealthKit hands results back on a background queue.
+    private struct ImportedWorkout: Sendable {
+        let start: Date
+        let end: Date
+        let uuid: UUID
+    }
+
     /// Import workouts from Apple Health that Orbit hasn't seen yet (deduped by start date + source).
     /// New workouts are inserted as `source = .health` so they get the "Apple Health" badge in history.
     /// Fire-and-forget: never blocks the caller.
@@ -91,35 +95,35 @@ public final class HealthKitService: Sendable {
         let workoutType = HKObjectType.workoutType()
         let predicate = HKQuery.predicateForSamples(withStart: Date.distantPast, end: Date.now,
                                                     options: .strictStartDate)
-        return await withCheckedContinuation { continuation in
+        // HealthKit answers on a background queue. Only Sendable values cross back; SwiftData stays on MainActor.
+        let workouts: [ImportedWorkout] = await withCheckedContinuation { continuation in
             let query = HKSampleQuery(sampleType: workoutType, predicate: predicate, limit: HKObjectQueryNoLimit,
                                       sortDescriptors: nil) { _, samples, _ in
-                guard let workouts = samples as? [HKWorkout] else {
-                    continuation.resume(returning: 0)
-                    return
-                }
-                let known = (try? context.fetch(FetchDescriptor<WorkoutSession>())) ?? []
-                var imported = 0
-                for workout in workouts {
-                    // Dedupe: skip if we already imported this exact workout (same start + source=health).
-                    let alreadyImported = known.contains { s in
-                        s.sourceRaw == WorkoutSource.health.rawValue
-                            && s.startedAt.timeIntervalSince1970 == workout.startDate.timeIntervalSince1970
-                    }
-                    if alreadyImported { continue }
-                    let session = WorkoutSession(startedAt: workout.startDate, source: .health,
-                                                 activityType: "strength")
-                    session.endedAt = workout.endDate
-                    session.healthKitUUID = workout.uuid
-                    session.note = "Impor dari Apple Health"
-                    context.insert(session)
-                    imported += 1
-                }
-                try? context.save()
-                continuation.resume(returning: imported)
+                let found = (samples as? [HKWorkout]) ?? []
+                continuation.resume(returning: found.map {
+                    ImportedWorkout(start: $0.startDate, end: $0.endDate, uuid: $0.uuid)
+                })
             }
             store.execute(query)
         }
+        let known = (try? context.fetch(FetchDescriptor<WorkoutSession>())) ?? []
+        var imported = 0
+        for workout in workouts {
+            // Dedupe: skip if we already imported this exact workout (same start + source=health).
+            let alreadyImported = known.contains { s in
+                s.sourceRaw == WorkoutSource.health.rawValue
+                    && s.startedAt.timeIntervalSince1970 == workout.start.timeIntervalSince1970
+            }
+            if alreadyImported { continue }
+            let session = WorkoutSession(startedAt: workout.start, source: .health, activityType: "strength")
+            session.endedAt = workout.end
+            session.healthKitUUID = workout.uuid
+            session.note = "Impor dari Apple Health"
+            context.insert(session)
+            imported += 1
+        }
+        if imported > 0 { try? context.save() }
+        return imported
     }
 
     /// Read step count for a date range (HLT-01). Returns total steps, or nil if not authorized.
