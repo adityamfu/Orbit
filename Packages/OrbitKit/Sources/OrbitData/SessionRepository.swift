@@ -123,6 +123,8 @@ public enum SessionRepository {
         session.endedAt = now
         session.updatedAt = now
         save(context)
+        // HLT-02: save finished session to Apple Health (no-op if permission denied / not available).
+        HealthKitService.shared.save(session: session, context: context)
         return records(for: session, history: history)
     }
 

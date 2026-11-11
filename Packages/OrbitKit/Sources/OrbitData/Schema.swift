@@ -92,16 +92,19 @@ public enum OrbitSchemaV1: VersionedSchema {
 }
 
 public enum OrbitMigrationPlan: SchemaMigrationPlan {
-    public static var schemas: [any VersionedSchema.Type] { [OrbitSchemaV1.self, OrbitSchemaV2.self, OrbitSchemaV3.self] }
-    /// Each step only adds models (V2 workouts, V3 finance), so SwiftData can migrate on its own.
+    public static var schemas: [any VersionedSchema.Type] {
+        [OrbitSchemaV1.self, OrbitSchemaV2.self, OrbitSchemaV3.self, OrbitSchemaV4.self]
+    }
+    /// Each step only adds models (V2 workouts, V3 finance, V4 KPI goals), so SwiftData can migrate on its own.
     public static var stages: [MigrationStage] {
         [.lightweight(fromVersion: OrbitSchemaV1.self, toVersion: OrbitSchemaV2.self),
-         .lightweight(fromVersion: OrbitSchemaV2.self, toVersion: OrbitSchemaV3.self)]
+         .lightweight(fromVersion: OrbitSchemaV2.self, toVersion: OrbitSchemaV3.self),
+         .lightweight(fromVersion: OrbitSchemaV3.self, toVersion: OrbitSchemaV4.self)]
     }
 }
 
 /// The schema the app runs on today.
-public typealias OrbitSchemaCurrent = OrbitSchemaV3
+public typealias OrbitSchemaCurrent = OrbitSchemaV4
 
 public typealias Habit = OrbitSchemaV1.Habit
 public typealias HabitLog = OrbitSchemaV1.HabitLog

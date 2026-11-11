@@ -8,6 +8,7 @@ public struct FinanceRecords: Codable, Equatable, Sendable {
     public var transactions: [TransactionRecord] = []
     public var budgets: [BudgetRecord] = []
     public var recurring: [RecurringRecord] = []
+    public var weeklyGoals: [WeeklyGoalRecord] = []
 
     public init() {}
 
@@ -34,6 +35,10 @@ public struct FinanceRecords: Codable, Equatable, Sendable {
         var id: UUID, createdAt: Date, updatedAt: Date, kindRaw: String, amount: Int64, walletID: UUID
         var toWalletID: UUID?, categoryID: UUID?, note: String, frequencyRaw: String, dayOfMonth: Int?
         var weekday: Int?, month: Int?, startDate: Date, endDate: Date?, nextDueDate: Date, modeRaw: String, isActive: Bool
+    }
+
+    public struct WeeklyGoalRecord: Codable, Equatable, Sendable {
+        var weekKey: Int, metricRaw: String, target: Double, reason: String, statusRaw: String
     }
 }
 
@@ -62,9 +67,14 @@ extension FinanceRecords {
                             startDate: $0.startDate, endDate: $0.endDate, nextDueDate: $0.nextDueDate, modeRaw: $0.modeRaw,
                             isActive: $0.isActive)
         }
+        weeklyGoals = try context.fetch(FetchDescriptor<WeeklyGoal>()).map {
+            WeeklyGoalRecord(weekKey: $0.weekKey, metricRaw: $0.metricRaw, target: $0.target,
+                             reason: $0.reason, statusRaw: $0.statusRaw)
+        }
     }
 
     static func deleteAll(in context: ModelContext) throws {
+        try context.delete(model: WeeklyGoal.self)
         try context.delete(model: Budget.self)
         try context.delete(model: FinanceTransaction.self)
         try context.delete(model: RecurringRule.self)
@@ -121,6 +131,12 @@ extension FinanceRecords {
             rule.modeRaw = r.modeRaw
             rule.isActive = r.isActive
             context.insert(rule)
+        }
+        for r in weeklyGoals {
+            let g = WeeklyGoal(weekKey: r.weekKey, metric: WeeklyMetric(rawValue: r.metricRaw) ?? .sessions,
+                               target: r.target, reason: r.reason,
+                               status: WeeklyGoalStatus(rawValue: r.statusRaw) ?? .suggested)
+            context.insert(g)
         }
     }
 }

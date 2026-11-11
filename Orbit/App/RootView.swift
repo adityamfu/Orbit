@@ -14,7 +14,7 @@ struct RootView: View {
             Tab { FinanceView().sessionMiniBar() } label: { tabLabel("tab.finance", "wallet.bifold") }
             Tab { HabitsView().sessionMiniBar() } label: { tabLabel("tab.habits", "checkmark.circle") }
             Tab { WorkoutView().sessionMiniBar() } label: { tabLabel("tab.workout", "dumbbell") }
-            Tab { ComingSoonView(title: "tab.insights", icon: "chart.line.uptrend.xyaxis").sessionMiniBar() } label: {
+            Tab { InsightView().sessionMiniBar() } label: {
                 tabLabel("tab.insights", "chart.line.uptrend.xyaxis")
             }
         }

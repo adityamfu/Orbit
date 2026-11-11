@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Orbit menyimpan sesi latihan kamu ke Apple Health sebagai data latihan.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Orbit perlu membaca data latihan dan langkah dari Apple Health untuk laporan mingguan.</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

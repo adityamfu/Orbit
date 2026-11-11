@@ -59,7 +59,27 @@ struct OrbitApp: App {
                 }
                 // Notifications follow the data and the app language (NTF rules: re-plan on open and on change).
                 .onChange(of: language) { NotificationScheduler.requestReschedule() }
-                .onChange(of: scenePhase) { _, phase in if phase == .active { NotificationScheduler.requestReschedule() } }
+                // Sync Apple Health when the app opens or returns to foreground (HLT-04).
+                // shortcut: HealthKit queries run on the main actor via semaphore.wait(), so the UI may
+                //   freeze briefly on first import. Ceiling: noticeable pause on cold start with lots of
+                //   Health data. Upgrade path: move importWorkouts to a background Task with async HKQuery.
+                .task {
+                    if HealthKitService.shared.isAvailable {
+                        try? await HealthKitService.shared.requestAuthorization()
+                        _ = HealthKitService.shared.importWorkouts(into: container.mainContext)
+                    }
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active {
+                        NotificationScheduler.requestReschedule()
+                        if HealthKitService.shared.isAvailable {
+                            Task {
+                                try? await HealthKitService.shared.requestAuthorization()
+                                _ = HealthKitService.shared.importWorkouts(into: container.mainContext)
+                            }
+                        }
+                    }
+                }
         }
     }
 
