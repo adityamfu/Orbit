@@ -37,7 +37,7 @@ public enum Period {
 }
 
 /// FIN-06: compare the share of the budget spent with the share of the period gone.
-public enum BudgetStatus: Equatable, Sendable {
+public enum BudgetStatus: Equatable, Hashable, Sendable {
     case safe
     case warning
     /// Percent over the limit (Lewat 4%).
