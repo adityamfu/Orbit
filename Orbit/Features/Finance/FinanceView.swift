@@ -17,6 +17,9 @@ struct FinanceView: View {
     @State private var period = Period.key(.now, cycleDay: SettingsSnapshot(from: .orbit).cycleStartDay)
     @State private var showAdd = false
     @State private var showNewWallet = false
+    @State private var showWallets = false
+    @State private var showCategories = false
+    @State private var showHistory = false
 
     var body: some View {
         let interval = Period.interval(period, cycleDay: cycleDay)
@@ -26,8 +29,13 @@ struct FinanceView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     ScreenHeader(Text("tab.finance")) {
-                        RoundAddButton(label: Text("finance.add")) {
-                            if wallets.isEmpty { showNewWallet = true } else { showAdd = true }
+                        HStack(spacing: 8) {
+                            RoundAddButton(label: Text("finance.add")) {
+                                if wallets.isEmpty { showNewWallet = true } else { showAdd = true }
+                            }
+                            financeAction("finance.wallets.title", "wallet.bifold") { showWallets = true }
+                            financeAction("finance.categories.title", "folder") { showCategories = true }
+                            financeAction("finance.history.title", "clock") { showHistory = true }
                         }
                     }
 
@@ -53,9 +61,23 @@ struct FinanceView: View {
             .navigationTitle(Text("tab.finance"))
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showAdd) { QuickAddView().presentationDetents([.large]) }
-            .sheet(isPresented: $showNewWallet) { WalletFormView(nextSortOrder: wallets.count) }
+            .sheet(isPresented: $showNewWallet) { WalletFormView(wallet: nil, nextSortOrder: wallets.count) }
+            .sheet(isPresented: $showWallets) { NavigationStack { WalletListView() } }
+            .sheet(isPresented: $showCategories) { NavigationStack { CategoryListView() } }
+            .sheet(isPresented: $showHistory) { NavigationStack { TransactionHistoryView() } }
             .onChange(of: cycleDay) { _, day in period = Period.key(.now, cycleDay: day) }
         }
+    }
+
+    private func financeAction(_ key: LocalizedStringKey, _ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.body.weight(.semibold))
+                .frame(width: 40, height: 40)
+                .background(Color.orbit.iconTile, in: .circle)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(key))
     }
 
     // MARK: Sections
@@ -376,55 +398,6 @@ struct TransactionRow: View {
         case .expense: Rupiah.format(-transaction.amount)
         case .income: Rupiah.format(transaction.amount, signed: true)
         case .transfer: Rupiah.format(transaction.amount)
-        }
-    }
-}
-
-/// New wallet: name, type, starting balance (FIN-01). Full management arrives in 4c.
-struct WalletFormView: View {
-    let nextSortOrder: Int
-    @Environment(\.modelContext) private var context
-    @Environment(\.dismiss) private var dismiss
-    @State private var name = ""
-    @State private var type = WalletType.bank
-    @State private var initial = ""
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                TextField("finance.wallet.name", text: $name)
-                Picker("finance.wallet.type", selection: $type) {
-                    ForEach(WalletType.allCases, id: \.self) { Text($0.titleKey).tag($0) }
-                }
-                TextField("finance.wallet.initial", text: $initial)
-                    .keyboardType(.numberPad)
-            }
-            .navigationTitle(Text("finance.wallet.add"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("common.cancel") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("common.save") {
-                        FinanceRepository.createWallet(name: name.trimmingCharacters(in: .whitespaces), type: type,
-                                                       initialBalance: Int64(initial.filter(\.isNumber)) ?? 0,
-                                                       sortOrder: nextSortOrder, in: context)
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-        }
-    }
-}
-
-extension WalletType {
-    var titleKey: LocalizedStringKey {
-        switch self {
-        case .cash: "finance.walletType.cash"
-        case .bank: "finance.walletType.bank"
-        case .eWallet: "finance.walletType.eWallet"
-        case .other: "finance.walletType.other"
         }
     }
 }

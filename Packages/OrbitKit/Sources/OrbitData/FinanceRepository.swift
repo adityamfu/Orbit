@@ -46,6 +46,30 @@ public enum FinanceRepository {
         return w
     }
 
+    /// Used wallets are archived, never deleted (CLAUDE.md data rule).
+    public static func setArchived(_ archived: Bool, _ wallet: Wallet) {
+        wallet.isArchived = archived
+        wallet.updatedAt = .now
+        wallet.modelContext.map(save)
+    }
+
+    /// Used categories are archived, never deleted (CLAUDE.md data rule).
+    public static func setArchived(_ archived: Bool, _ category: MoneyCategory) {
+        category.isArchived = archived
+        category.updatedAt = .now
+        category.modelContext.map(save)
+    }
+
+    /// FIN-04: create a custom category.
+    @discardableResult
+    public static func createCategory(name: String, kind: MoneyKind, iconName: String, sortOrder: Int,
+                                      in context: ModelContext) -> MoneyCategory {
+        let c = MoneyCategory(name: name, kind: kind, iconName: iconName, isDefault: false, sortOrder: sortOrder)
+        context.insert(c)
+        save(context)
+        return c
+    }
+
     public static func save(_ context: ModelContext) {
         do {
             try context.save()
