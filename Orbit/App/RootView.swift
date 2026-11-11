@@ -6,6 +6,7 @@ import OrbitUI
 /// Icon-only tab bar (DESIGN.md §4). Labels stay for VoiceOver.
 struct RootView: View {
     @Environment(SessionCoordinator.self) private var coordinator
+    @AppStorage(SettingsKey.firstLaunch, store: .orbit) private var firstLaunch = true
 
     var body: some View {
         @Bindable var coordinator = coordinator
@@ -22,6 +23,10 @@ struct RootView: View {
         // WRK-14: the running session is full screen and always dark.
         .fullScreenCover(isPresented: $coordinator.isPresented) {
             ActiveSessionView()
+        }
+        // PRD §4.10: onboarding shown once on first launch.
+        .sheet(isPresented: $firstLaunch) {
+            OnboardingView()
         }
     }
 

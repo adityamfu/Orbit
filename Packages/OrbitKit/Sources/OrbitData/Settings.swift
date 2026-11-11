@@ -25,6 +25,7 @@ public enum SettingsKey {
     public static let streakSaverEnabled = "streakSaverEnabled"
     public static let streakSaverMinutes = "streakSaverMinutes"
     public static let lastBackupAt = "lastBackupAt"
+    public static let firstLaunch = "firstLaunch"
 }
 
 public enum AppLanguage: String, CaseIterable, Codable, Sendable {
